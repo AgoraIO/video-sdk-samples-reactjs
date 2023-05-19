@@ -1,6 +1,6 @@
 import React from "react";
-import AgoraManager from "../AgoraHelper/AgoraManager";
-import VideoCallUI from "./AgoraUI";
+import AgoraManager from "../AgoraManager/AgoraManager";
+import VideoCallUI from "../AgoraManager/AgoraUI";
 
 // Initialize the Agora application ID, token, and channel name
 const appId = '';

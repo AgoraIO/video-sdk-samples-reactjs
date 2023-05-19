@@ -17,7 +17,7 @@ This section explains how Video Calling works in an app. Best practice is to imp
 - *Send and receive video and audio in the channel*: All users send and receive video and audio streams from all users in the channel.
 
 
-![Video Calling Web UIKit](./images/video-call.png)
+![Video Calling Web UIKit](../../public/doc-assets/video-call.png)
 
 ## Prerequisites
 
