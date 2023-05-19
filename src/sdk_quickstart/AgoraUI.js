@@ -7,38 +7,29 @@ class VideoCallUI extends Component {
     this.localVideoRef = React.createRef();
     this.remoteVideoRef = React.createRef();
   }
-
-  componentDidMount() {
-    // Call the playVideoTracks method when the component mounts
-    this.playVideoTracks();
-  }
-
-  componentDidUpdate(prevProps) {
-    // Check if the local or remote video tracks have changed
-    if (
-      prevProps.localVideoTrack !== this.props.localVideoTrack ||
-      prevProps.remoteVideoTrack !== this.props.remoteVideoTrack
-    ) {
-      // Call the playVideoTracks method to play the updated tracks
+  componentDidUpdate(prevProps) 
+  {
+    if(prevProps.localVideoTrack!== null || prevProps.remoteVideoTrack !== null)
+    {
       this.playVideoTracks();
     }
   }
-
   playVideoTracks() {
     const { localVideoTrack, remoteVideoTrack } = this.props;
     // Play the local video track on the local video element
-    if (localVideoTrack) {
+    if (localVideoTrack && this.localVideoRef.current) 
+    {
+      console.log("Playing local video track");
       localVideoTrack.play(this.localVideoRef.current);
     }
     // Play the remote video track on the remote video element
-    if (remoteVideoTrack) {
+    if (remoteVideoTrack && this.remoteVideoRef.current) {
       remoteVideoTrack.play(this.remoteVideoRef.current);
     }
   }
 
   render() {
     const { joined, showVideo, handleJoinCall, handleLeaveCall } = this.props;
-
     return (
       <div>
         <header className="App-header">
