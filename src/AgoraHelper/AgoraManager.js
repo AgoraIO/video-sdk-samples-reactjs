@@ -1,8 +1,10 @@
 import AgoraRTC from "agora-rtc-react";
 import React from "react";
+
 class AgoraManager extends React.Component {
   constructor(props) {
     super(props);
+    // Initialize the component state with default values
     this.state = {
       client: null,
       microphoneAndCameraTracks: null,
@@ -18,24 +20,32 @@ class AgoraManager extends React.Component {
   }
 
   async setupVideoSDKEngine() {
+    // Create an Agora client with mode "rtc" and codec "vp8"
     const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+    // Create microphone and camera tracks using AgoraRTC
     const microphoneAndCameraTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
+    // Set the local video track to the second track in the microphoneAndCameraTracks array
     this.setState({
-    client: client,
-    microphoneAndCameraTracks: microphoneAndCameraTracks,
-    localVideoTrack: microphoneAndCameraTracks[1],
-  });
+      client: client,
+      microphoneAndCameraTracks: microphoneAndCameraTracks,
+      localVideoTrack: microphoneAndCameraTracks[1],
+    });
 
+    // Subscribe to the "user-published" event to handle remote video track publication
     client.on("user-published", async (user, mediaType) => {
       if (mediaType === "video") {
+        // Subscribe to the remote user's video track
         await client.subscribe(user, mediaType);
         console.log(user.videoTrack);
+        // Set the remote video track in the component state
         this.setState({ remoteVideoTrack: user.videoTrack });
       }
     });
 
+    // Handle the "user-unpublished" event to remove remote video track when a user unpublishes
     client.on("user-unpublished", (user, mediaType) => {
       if (mediaType === "video") {
+        // Reset the remote video track in the component state
         this.setState({ remoteVideoTrack: null });
       }
     });
@@ -43,14 +53,17 @@ class AgoraManager extends React.Component {
 
   async joinCall() {
     try {
-      const { client,microphoneAndCameraTracks,appId, channelName, token, uid } = this.state;
+      const { client, microphoneAndCameraTracks, appId, channelName, token, uid } = this.state;
+      // Join the Agora channel using the provided appId, channelName, token, and uid
       await client.join(appId, channelName, token, uid);
+      // Publish the microphone and camera tracks
       await client.publish(microphoneAndCameraTracks);
+      // Update the component state to indicate that the user has joined the call and video should be shown
       this.setState({
         joined: true,
         showVideo: true,
-      }, ()=>
-      {
+      }, () => {
+        // Call the render method after the state has been updated
         this.render();
       });
     } catch (error) {
@@ -58,12 +71,14 @@ class AgoraManager extends React.Component {
     }
   }
 
-
   async leaveCall() {
     try {
-      const { client,microphoneAndCameraTracks } = this.state;
+      const { client, microphoneAndCameraTracks } = this.state;
+      // Unpublish the microphone and camera tracks
       await client.unpublish(microphoneAndCameraTracks);
+      // Leave the Agora channel
       await client.leave();
+      // Reset the component state to its initial values
       this.setState({
         joined: false,
         showVideo: false,
@@ -72,13 +87,13 @@ class AgoraManager extends React.Component {
       console.error("Failed to unpublish or leave:", error);
     }
   }
-  componentWillUnmount()
-  {
-    this.setState(
-      {
-        localVideoTrack: null,
-        remoteVideoTrack: null
-      });
+
+  componentWillUnmount() {
+    // Reset the local and remote video tracks in the component state before unmounting
+    this.setState({
+      localVideoTrack: null,
+      remoteVideoTrack: null,
+    });
   }
 }
 
