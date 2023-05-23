@@ -3,9 +3,9 @@ import AgoraManager from "../AgoraHelper/AgoraManager";
 import VideoCallUI from "../AgoraHelper/AgoraUI";
 import AgoraRTC from "agora-rtc-react";
 
-const appId = '<Your app ID>';
-const channelName = '<Your channel name>';
-const token = '<Authentication token>';
+const appId = '<Your app ID>'; // Agora App ID
+const channelName = '<Your channel name>'; // Name of the channel to join
+const token = '<Authentication token>'; // Token for authentication
 
 class EnsureCallQuality extends AgoraManager {
   constructor(props) {
@@ -28,8 +28,8 @@ class EnsureCallQuality extends AgoraManager {
     const { client } = this.state;
     if (client == null) {
       console.log("Init Engine");
-      await this.setupVideoSDKEngine();
-      this.enableCallQualityFeatures();
+      await this.setupVideoSDKEngine(); // Set up the video SDK engine
+      this.enableCallQualityFeatures(); // Enable call quality features
     }
   }
 
@@ -48,13 +48,14 @@ class EnsureCallQuality extends AgoraManager {
       });
 
       const localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack({ encoderConfig: "high_quality_stereo" });
-      client.enableDualStream();
+      client.enableDualStream(); // Enable dual stream for the client
 
       this.setState({
         localVideoTrack: localVideoTrack,
         microphoneAndCameraTracks: [localAudioTrack, localVideoTrack]
       });
 
+      // Event listeners for connection state change and network quality
       client.on("connection-state-change", (curState, prevState, reason) => {
         console.log("Connection state has changed to: " + curState);
         console.log("Connection state was: " + prevState);
@@ -75,12 +76,14 @@ class EnsureCallQuality extends AgoraManager {
         }
       });
 
+      // Event listener for user-published event
       client.on("user-published", async (user, mediaType) => {
         if (mediaType === "video") {
-          client.setStreamFallbackOption(user.uid, 1);
+          client.setStreamFallbackOption(user.uid, 1); // Set stream fallback option for video
         }
       });
 
+      // Get available audio and video devices
       AgoraRTC.getDevices()
         .then(devices => {
           const audioDevices = devices.filter(device => device.kind === "audioinput");
@@ -96,6 +99,7 @@ class EnsureCallQuality extends AgoraManager {
   showStatistics = async () => {
     const { client, remoteUid } = this.state;
     if (client) {
+      // Display local audio, video, and channel statistics
       const localAudioStats = client.getLocalAudioStats();
       console.log("Local audio stats = { sendBytes :" + localAudioStats.sendBytes + ", sendBitrate :" + localAudioStats.sendBitrate + ", sendPacketsLost :" + localAudioStats.sendPacketsLost + " }");
       const localVideoStats = client.getLocalVideoStats();
@@ -104,6 +108,7 @@ class EnsureCallQuality extends AgoraManager {
       console.log("Channel statistics = { UserCount :" + rtcStats.UserCount + ", OutgoingAvailableBandwidth :" + rtcStats.OutgoingAvailableBandwidth + ", RTT :" + rtcStats.RTT + " }");
 
       if (remoteUid === null) {
+        // Display remote audio and video statistics
         const remoteAudioStats = client.getRemoteAudioStats()[remoteUid];
         console.log("Remote audio stats = { receiveBytes :" + remoteAudioStats.receivedBytes + ", receiveBitrate :" + remoteAudioStats.receiveBitrate + ", receivePacketsLost :" + remoteAudioStats.receivePacketsLost + " }");
         const remoteVideoStats = client.getRemoteVideoStats()[remoteUid];
@@ -120,7 +125,7 @@ class EnsureCallQuality extends AgoraManager {
 
   startDeviceTest = async () => {
     const { client, isDeviceTestRunning, microphoneAndCameraTracks, videoDevices, audioDevices } = this.state;
-
+    // Create tracks using the selected devices and publish tracks in the channel.
     if (!isDeviceTestRunning) {
       const videoTrack = await AgoraRTC.createCameraVideoTrack({ cameraId: videoDevices[0].deviceId });
       const audioTrack = await AgoraRTC.createMicrophoneAudioTrack({ microphoneId: audioDevices[0].deviceId });

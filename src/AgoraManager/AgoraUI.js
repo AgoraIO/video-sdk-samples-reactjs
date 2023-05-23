@@ -19,7 +19,6 @@ class VideoCallUI extends Component {
     // Play the local video track on the local video element
     if (localVideoTrack && this.localVideoRef.current) 
     {
-      console.log("Playing local video track");
       localVideoTrack.play(this.localVideoRef.current);
     }
     // Play the remote video track on the remote video element
