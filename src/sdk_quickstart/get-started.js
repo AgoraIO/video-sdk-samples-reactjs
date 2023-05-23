@@ -1,11 +1,11 @@
 import React from "react";
-import AgoraManager from "../AgoraManager/AgoraManager";
-import VideoCallUI from "../AgoraManager/AgoraUI";
+import AgoraManager from "../AgoraHelper/AgoraManager";
+import VideoCallUI from "../AgoraHelper/AgoraUI";
 
 // Initialize the Agora application ID, token, and channel name
-const appId = '';
-const channelName = '';
-const token = '';
+const appId = '<Your app ID>';
+const channelName = '<Your channel name>';
+const token = '<Authentication token>';
 
 // VideoCall class inherits from AgoraManager
 class VideoCall extends AgoraManager {
