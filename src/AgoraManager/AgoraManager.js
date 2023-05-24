@@ -4,7 +4,6 @@ import React from "react";
 class AgoraManager extends React.Component {
   constructor(props) {
     super(props);
-    // Initialize the component state with default values
     this.state = {
       client: null,
       microphoneAndCameraTracks: null,
@@ -14,71 +13,67 @@ class AgoraManager extends React.Component {
       channelName: null,
       localVideoTrack: null,
       remoteVideoTrack: null,
+      localAudioTrack: null,
+      remoteAudioTrack: null,
       showVideo: false,
       uid: 0,
+      remoteUid: null
     };
   }
 
+  async componentDidMount() {
+    await this.setupVideoSDKEngine();
+  }
+
+  // Setup an instance of the agora SDK and create microphone and camera tracks.
   async setupVideoSDKEngine() {
-    // Create an Agora client with mode "rtc" and codec "vp8"
     const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
-    // Create microphone and camera tracks using AgoraRTC
     const microphoneAndCameraTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-    // Set the local video track to the second track in the microphoneAndCameraTracks array
     this.setState({
       client: client,
       microphoneAndCameraTracks: microphoneAndCameraTracks,
-      localVideoTrack: microphoneAndCameraTracks[1],
+      localAudioTrack: microphoneAndCameraTracks[0],
+      localVideoTrack: microphoneAndCameraTracks[1]
     });
 
-    // Subscribe to the "user-published" event to handle remote video track publication
+    // Triggers when a remote user publishes the media stream in the channel. 
     client.on("user-published", async (user, mediaType) => {
       if (mediaType === "video") {
-        // Subscribe to the remote user's video track
         await client.subscribe(user, mediaType);
         console.log(user.videoTrack);
-        // Set the remote video track in the component state
-        this.setState({ remoteVideoTrack: user.videoTrack });
+        this.setState({ remoteVideoTrack: user.videoTrack, remoteAudioTrack: user.audioTrack, remoteUid:user.uid });
       }
     });
-
-    // Handle the "user-unpublished" event to remove remote video track when a user unpublishes
+    // Triggers when a remote user unpublishes the media stream in the channel. 
     client.on("user-unpublished", (user, mediaType) => {
       if (mediaType === "video") {
-        // Reset the remote video track in the component state
-        this.setState({ remoteVideoTrack: null });
+        this.setState({ remoteVideoTrack: null, remoteUid: null });
       }
     });
   }
 
+  // Function to join the channel.
   async joinCall() {
     try {
       const { client, microphoneAndCameraTracks, appId, channelName, token, uid } = this.state;
-      // Join the Agora channel using the provided appId, channelName, token, and uid
       await client.join(appId, channelName, token, uid);
-      // Publish the microphone and camera tracks
       await client.publish(microphoneAndCameraTracks);
-      // Update the component state to indicate that the user has joined the call and video should be shown
       this.setState({
         joined: true,
         showVideo: true,
       }, () => {
-        // Call the render method after the state has been updated
         this.render();
       });
     } catch (error) {
       console.error("Failed to join or publish:", error);
     }
   }
-
+ // Function to leave the channel.
   async leaveCall() {
     try {
       const { client, microphoneAndCameraTracks } = this.state;
-      // Unpublish the microphone and camera tracks
       await client.unpublish(microphoneAndCameraTracks);
-      // Leave the Agora channel
       await client.leave();
-      // Reset the component state to its initial values
       this.setState({
         joined: false,
         showVideo: false,
@@ -86,14 +81,6 @@ class AgoraManager extends React.Component {
     } catch (error) {
       console.error("Failed to unpublish or leave:", error);
     }
-  }
-
-  componentWillUnmount() {
-    // Reset the local and remote video tracks in the component state before unmounting
-    this.setState({
-      localVideoTrack: null,
-      remoteVideoTrack: null,
-    });
   }
 }
 

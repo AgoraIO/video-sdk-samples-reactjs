@@ -27,7 +27,6 @@ class EnsureCallQuality extends AgoraManager {
 
     const { client } = this.state;
     if (client == null) {
-      console.log("Init Engine");
       await this.setupVideoSDKEngine(); // Set up the video SDK engine
       this.enableCallQualityFeatures(); // Enable call quality features
     }
@@ -124,8 +123,12 @@ class EnsureCallQuality extends AgoraManager {
   };
 
   startDeviceTest = async () => {
-    const { client, isDeviceTestRunning, microphoneAndCameraTracks, videoDevices, audioDevices } = this.state;
-    // Create tracks using the selected devices and publish tracks in the channel.
+    const { client, joined, isDeviceTestRunning, microphoneAndCameraTracks, videoDevices, audioDevices } = this.state;
+    if(!joined)
+    {
+      console.log("Join a channel to test your audio/video devices");
+      return;
+    }    // Create tracks using the selected devices and publish tracks in the channel.
     if (!isDeviceTestRunning) {
       const videoTrack = await AgoraRTC.createCameraVideoTrack({ cameraId: videoDevices[0].deviceId });
       const audioTrack = await AgoraRTC.createMicrophoneAudioTrack({ microphoneId: audioDevices[0].deviceId });
@@ -146,8 +149,6 @@ class EnsureCallQuality extends AgoraManager {
       client.unpublish();
       client.publish(microphoneAndCameraTracks);
     }
-
-    this.render();
   }
 
   handleLeaveCall = async () => {
