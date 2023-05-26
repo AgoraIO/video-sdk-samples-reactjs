@@ -5,7 +5,7 @@ import VideoCallUI from "../AgoraHelper/AgoraUI";
 // Initialize the Agora application ID, token, and channel name
 const appId = '<Your app ID>';
 const channelName = '<Your channel name>';
-const token = '<Authentication token>';
+const token = '<Your authentication token>';
 
 // VideoCall class inherits from AgoraManager
 class VideoCall extends AgoraManager {
@@ -16,6 +16,7 @@ class VideoCall extends AgoraManager {
       channelName: channelName,
       token: token
     });
+
     // Initialize the AgoraManager
     await this.setupVideoSDKEngine();
   }
@@ -32,6 +33,7 @@ class VideoCall extends AgoraManager {
 
   render() {
     const { joined, showVideo, localVideoTrack, remoteVideoTrack } = this.state;
+
     return (
       // Render the VideoCallUI component with the necessary props
       <VideoCallUI

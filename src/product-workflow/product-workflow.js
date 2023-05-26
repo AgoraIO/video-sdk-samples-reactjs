@@ -3,11 +3,11 @@ import AgoraManager from "../AgoraHelper/AgoraManager";
 import VideoCallUI from "../AgoraHelper/AgoraUI";
 import AgoraRTC from "agora-rtc-react";
 
-const appId = '<your app ID>';
+const appId = '<Your app ID>';
 const channelName = '<Your channel name>';
 const token = '<Your authentication token>';
 
-class ProductWorkflow extends AgoraManager {
+class ProductWorkflowComponent extends AgoraManager {
   constructor(props) {
     super(props);
     this.state = {
@@ -16,6 +16,7 @@ class ProductWorkflow extends AgoraManager {
       screenTrack: null,
       remoteAudioTrack: null
     };
+    this.screenTrackRef = React.createRef();
   }
 
   async componentDidMount() {
@@ -27,6 +28,7 @@ class ProductWorkflow extends AgoraManager {
 
     const { client } = this.state;
     if (client == null) {
+      console.log("Init Engine");
       await this.setupVideoSDKEngine();
       await this.setupDeviceManager();
     }
@@ -110,7 +112,7 @@ class ProductWorkflow extends AgoraManager {
 
   handleRemoteAudioVolumeChange = (evt) => {
     const { remoteAudioTrack } = this.state;
-    if (remoteAudioTrack === null) {
+    if (remoteAudioTrack) {
       const volume = parseInt(evt.target.value);
       console.log('Volume of remote audio:', volume);
       remoteAudioTrack.setVolume(volume);
@@ -172,4 +174,4 @@ class ProductWorkflow extends AgoraManager {
   }
 }
 
-export default ProductWorkflow;
+export default ProductWorkflowComponent;

@@ -5,7 +5,7 @@ class AgoraManager extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      client: null,
+      agoraEngine: null,
       microphoneAndCameraTracks: null,
       joined: false,
       appId: null,
@@ -27,25 +27,22 @@ class AgoraManager extends React.Component {
 
   // Setup an instance of the agora SDK and create microphone and camera tracks.
   async setupVideoSDKEngine() {
-    const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+    const agoraEngine = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
     const microphoneAndCameraTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
     this.setState({
-      client: client,
+      agoraEngine: agoraEngine,
       microphoneAndCameraTracks: microphoneAndCameraTracks,
       localAudioTrack: microphoneAndCameraTracks[0],
       localVideoTrack: microphoneAndCameraTracks[1]
     });
 
     // Triggers when a remote user publishes the media stream in the channel. 
-    client.on("user-published", async (user, mediaType) => {
-      if (mediaType === "video") {
-        await client.subscribe(user, mediaType);
-        console.log(user.videoTrack);
+    agoraEngine.on("user-published", async (user, mediaType) => {
+        await agoraEngine.subscribe(user, mediaType);
         this.setState({ remoteVideoTrack: user.videoTrack, remoteAudioTrack: user.audioTrack, remoteUid:user.uid });
-      }
     });
     // Triggers when a remote user unpublishes the media stream in the channel. 
-    client.on("user-unpublished", (user, mediaType) => {
+    agoraEngine.on("user-unpublished", (user, mediaType) => {
       if (mediaType === "video") {
         this.setState({ remoteVideoTrack: null, remoteUid: null });
       }
@@ -55,9 +52,9 @@ class AgoraManager extends React.Component {
   // Function to join the channel.
   async joinCall() {
     try {
-      const { client, microphoneAndCameraTracks, appId, channelName, token, uid } = this.state;
-      await client.join(appId, channelName, token, uid);
-      await client.publish(microphoneAndCameraTracks);
+      const { agoraEngine, microphoneAndCameraTracks, appId, channelName, token, uid } = this.state;
+      await agoraEngine.join(appId, channelName, token, uid);
+      await agoraEngine.publish(microphoneAndCameraTracks);
       this.setState({
         joined: true,
         showVideo: true,
@@ -71,9 +68,9 @@ class AgoraManager extends React.Component {
  // Function to leave the channel.
   async leaveCall() {
     try {
-      const { client, microphoneAndCameraTracks } = this.state;
-      await client.unpublish(microphoneAndCameraTracks);
-      await client.leave();
+      const { agoraEngine, localAudioTrack, localVideoTrack } = this.state;
+      await agoraEngine.unpublish([localAudioTrack,localVideoTrack]);
+      await agoraEngine.leave();
       this.setState({
         joined: false,
         showVideo: false,
