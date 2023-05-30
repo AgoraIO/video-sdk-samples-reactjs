@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import GetStarted from './sdk_quickstart/get-started';
-import CallQuality from './call-quality/call-quality';
-import AudioEffects from './audio-and-voice-effects/audio-and-voice-effects';
-import ProductWorkflow from './product-workflow/product-workflow';
-import CloudProxy from './cloud-proxy/cloud-proxy';
-import MediaEncryption from './media-stream-encryption/media-stream-encryption';
+import GetStarted from './sdk_quickstart/get_started';
+import CallQuality from './call_quality/call_quality';
+import AudioEffects from './audio_and_voice_effects/audio_and_voice_effects';
+import ProductWorkflow from './product_workflow/product-workflow';
+import CloudProxy from './cloud_proxy/cloud_proxy';
+import MediaEncryption from './media_stream_encryption/media_stream_encryption';
 
 // Initialize the Agora application ID, token, and channel name
 const appId = '<Your app ID>';
