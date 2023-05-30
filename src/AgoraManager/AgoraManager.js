@@ -20,11 +20,6 @@ class AgoraManager extends React.Component {
       remoteUid: null
     };
   }
-
-  async componentDidMount() {
-    await this.setupVideoSDKEngine();
-  }
-
   // Setup an instance of the agora SDK and create microphone and camera tracks.
   async setupVideoSDKEngine() {
     const agoraEngine = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });

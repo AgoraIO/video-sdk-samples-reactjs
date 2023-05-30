@@ -19,6 +19,7 @@ class VideoCallUI extends Component {
     // Play the local video track on the local video element
     if (localVideoTrack && this.localVideoRef.current) 
     {
+      console.log("Playing local video track");
       localVideoTrack.play(this.localVideoRef.current);
     }
     // Play the remote video track on the remote video element
@@ -28,11 +29,11 @@ class VideoCallUI extends Component {
   }
 
   render() {
-    const { joined, showVideo, handleJoinCall, handleLeaveCall } = this.props;
+    const { joined, showVideo, handleJoinCall, handleLeaveCall, additionalContent} = this.props;
     return (
       <div>
         <header className="App-header">
-          <h1>Get started with video calling</h1>
+          <h1>{this.props.title}</h1>
         </header>
         <div>
           <div>
@@ -40,17 +41,21 @@ class VideoCallUI extends Component {
               {joined ? "Leave" : "Join"}
             </button>
           </div>
+          {additionalContent && (
+            <div>
+              {/* Render additional content here */}
+              {additionalContent}
+            </div>
+          )}
           {showVideo && (
             <div id="videos">
               <div className="vid" style={{ height: "95%", width: "95%" }}>
                 {this.props.localVideoTrack && (
-                  // Render the local video element using the localVideoRef
                   <video ref={this.localVideoRef} autoPlay />
                 )}
               </div>
               <div className="vid" style={{ height: "95%", width: "95%" }}>
                 {this.props.remoteVideoTrack && (
-                  // Render the remote video element using the remoteVideoRef
                   <video ref={this.remoteVideoRef} autoPlay />
                 )}
               </div>

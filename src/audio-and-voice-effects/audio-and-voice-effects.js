@@ -1,12 +1,12 @@
 import React from "react";
-import AgoraManager from "../AgoraHelper/AgoraManager";
-import VideoCallUI from "../AgoraHelper/AgoraUI";
+import AgoraManager from "../AgoraManager/AgoraManager";
+import VideoCallUI from "../AgoraManager/AgoraUI";
 import AgoraRTC from "agora-rtc-react";
 // ...imports
 
-const appId = '<App ID>'; // Agora App ID
-const channelName = '<Channel name>'; // Name of the channel to join
-const token = '<Your authentication token>'; // Token for authentication
+const appId = ''; // Agora App ID
+const channelName = ''; // Name of the channel to join
+const token = ''; // Token for authentication
 
 class ProductWorkflow extends AgoraManager {
   constructor(props) {
@@ -19,14 +19,30 @@ class ProductWorkflow extends AgoraManager {
     };
   }
 
-  async componentDidMount() {
-    this.setState({
-      appId: appId,
-      channelName: channelName,
-      token: token
-    });
+  async componentDidMount() 
+  {
+    if(this.props.appId && this.props.channelName && this.props.token)
+    {
+      this.setState({
+        appId: this.props.appId,
+        channelName: this.props.channelName,
+        token: this.props.token
+      });
+    }
+    else if(appId && channelName && token)
+    {
+      this.setState({
+        appId: appId,
+        channelName: channelName,
+        token: token
+      });
+    }
+    else{
+      console.log('You did not specify appId, channelName, and token');
+    }
 
-    if (!this.state.agoraEngine) {
+    if (!this.state.agoraEngine) 
+    {
       console.log("Init Engine");
       await this.setupVideoSDKEngine(); // Set up the video SDK engine
       this.setState({ playbackDevices: await AgoraRTC.getPlaybackDevices(true) });
@@ -126,6 +142,7 @@ class ProductWorkflow extends AgoraManager {
     return (
       <div>
         <VideoCallUI
+          title={this.props.title}
           joined={joined}
           showVideo={showVideo}
           localVideoTrack={localVideoTrack}

@@ -1,16 +1,18 @@
 import React from "react";
-import AgoraManager from "../AgoraHelper/AgoraManager";
-import VideoCallUI from "../AgoraHelper/AgoraUI";
+import AgoraManager from "../AgoraManager/AgoraManager";
+import VideoCallUI from "../AgoraManager/AgoraUI";
 import AgoraRTC from "agora-rtc-react";
 
-const appId = '<Your app ID>';
-const channelName = '<Your channel name>';
-const token = '<Your authentication token>';
+const appId = '';
+const channelName = '';
+const token = '';
 
 class ProductWorkflowComponent extends AgoraManager {
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
-    this.state = {
+    this.state = 
+    {
       isSharingEnabled: false,
       isMuteVideo: false,
       screenTrack: null,
@@ -19,15 +21,31 @@ class ProductWorkflowComponent extends AgoraManager {
     this.screenTrackRef = React.createRef();
   }
 
-  async componentDidMount() {
-    this.setState({
-      appId: appId,
-      channelName: channelName,
-      token: token
-    });
+  async componentDidMount() 
+  {
+    // If props values are not available or empty, use local variables
+    if(this.props.appId && this.props.channelName && this.props.token)
+    {
+      this.setState({
+        appId: this.props.appId,
+        channelName: this.props.channelName,
+        token: this.props.token
+      });
+    }
+    else if(appId && channelName && token)
+    {
+      this.setState({
+        appId: appId,
+        channelName: channelName,
+        token: token
+      });
+    }
+    else{
+      console.log('You did not specify appId, channelName, and token');
+    }
 
-    const { client } = this.state;
-    if (client == null) {
+    const { agoraEngine } = this.state;
+    if (agoraEngine == null) {
       console.log("Init Engine");
       await this.setupVideoSDKEngine();
       await this.setupDeviceManager();
@@ -35,24 +53,24 @@ class ProductWorkflowComponent extends AgoraManager {
   }
 
   async setupDeviceManager() {
-    const { client, localAudioTrack, localVideoTrack } = this.state;
-    if (client) {
+    const { agoraEngine, localAudioTrack, localVideoTrack } = this.state;
+    if (agoraEngine) {
       // Handle microphone change event
-      client.onMicrophoneChanged = async (changedDevice) => {
+      agoraEngine.onMicrophoneChanged = async (changedDevice) => {
         if (changedDevice.state === "ACTIVE") {
           localAudioTrack.setDevice(changedDevice.device.deviceId);
         } else if (changedDevice.device.label === localAudioTrack.getTrackLabel()) {
-          const oldMicrophones = await client.getMicrophones();
+          const oldMicrophones = await agoraEngine.getMicrophones();
           oldMicrophones[0] && localAudioTrack.setDevice(oldMicrophones[0].deviceId);
         }
       };
 
       // Handle camera change event
-      client.onCameraChanged = async (changedDevice) => {
+      agoraEngine.onCameraChanged = async (changedDevice) => {
         if (changedDevice.state === "ACTIVE") {
           localVideoTrack.setDevice(changedDevice.device.deviceId);
         } else if (changedDevice.device.label === localVideoTrack.getTrackLabel()) {
-          const oldCameras = await client.getCameras();
+          const oldCameras = await agoraEngine.getCameras();
           oldCameras[0] && localVideoTrack.setDevice(oldCameras[0].deviceId);
         }
       };
@@ -142,6 +160,7 @@ class ProductWorkflowComponent extends AgoraManager {
     return (
       <div>
         <VideoCallUI
+          title={this.props.title}
           joined={joined}
           showVideo={showVideo}
           localVideoTrack={localVideoTrack}
