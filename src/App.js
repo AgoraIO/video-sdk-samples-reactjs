@@ -62,6 +62,13 @@ function App() {
         token = {token}
         title = 'Secure channel encryption'
         />;
+      case "customMedia":
+        return <CustomMedia 
+        appId = {appId}
+        channelName = {channelName}
+        token = {token}
+        title = 'Customize your video and audio source'
+        />;
       default:
         return null;
     }
