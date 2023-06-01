@@ -63,11 +63,25 @@ function App() {
         title = 'Secure channel encryption'
         />;
       case "customMedia":
-        return <CustomMedia 
+      return <CustomMedia 
         appId = {appId}
         channelName = {channelName}
         token = {token}
         title = 'Customize your video and audio source'
+        />;
+      case "geofencing":
+      return <Geofencing 
+        appId = {appId}
+        channelName = {channelName}
+        token = {token}
+        title = 'Geofencing'
+        />;
+      case "spatialAudio":
+      return <SpatialAudio 
+        appId = {appId}
+        channelName = {channelName}
+        token = {token}
+        title = '3D Spatial Audio'
         />;
       default:
         return null;
@@ -85,6 +99,10 @@ function App() {
         <option value="mediaEncryption">Secure channel encryption</option>
         <option value="audioEffects">Audio and voice effects</option>
         <option value="cloudProxy">Cloud proxy</option>
+        <option value="customMedia">Custom Video and Audio</option> 
+        <option value="geofencing">Geofencing</option>
+        <option value="spatialAudio">3D Spatial Audio</option>
+ 
       </select>
       {renderSelectedOption()}
     </div>
