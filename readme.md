@@ -1,4 +1,4 @@
-# Agora Video SDK for Android sample projects
+# Agora Video SDK for ReactJS sample projects
 
 This repository holds the code examples used for the [Agora Video SDK for React ](https://docs.agora.io/en/video-calling/get-started/get-started-sdk?platform=web) documentation. Clone the repo, run and test the samples, use the code in your own project. Enjoy.
 
@@ -33,10 +33,9 @@ To run the sample projects in this folder, take the following steps:
 
 1. Open a command prompt in the project folder, and run the following command:
 
-  ``` bash
-  npm start
-  ```
-  The project opens in your default browser.
+    ``` bash
+    npm start
+    ```
+    The project opens in your default browser.
 
-1. Select an item from the dropdown to test the sample codes.
-
+1. Select a sample code form the dropdown that you wish to execute.
