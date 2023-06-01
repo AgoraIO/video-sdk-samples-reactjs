@@ -33,10 +33,10 @@ To run the sample projects in this folder, take the following steps:
 
 1. Open a command prompt in the project folder, and run the following command:
 
-  ``` bash
-  npm start
-  ```
-  The project opens in your default browser.
+    ``` bash
+    npm start
+    ```
+    The project opens in your default browser.
 
 1. Select an item from the dropdown to test the sample codes.
 
