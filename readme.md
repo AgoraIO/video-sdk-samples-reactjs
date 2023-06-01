@@ -28,7 +28,7 @@ To run the sample projects in this folder, take the following steps:
     npm i agora-rtc-react
     ```
 
-1. In `src/app.js`, replace `appID`, `channelName`, and `token` with your app ID, channel name , and authentication token.
+1. In `src/App.js`, replace `appID`, `channelName`, and `token` with your app ID, channel name , and authentication token.
 
 
 1. Open a command prompt in the project folder, and run the following command:
