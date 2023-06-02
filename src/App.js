@@ -5,6 +5,7 @@ import AudioEffects from './audio_and_voice_effects/audio_and_voice_effects';
 import ProductWorkflow from './product_workflow/product-workflow';
 import CloudProxy from './cloud_proxy/cloud_proxy';
 import MediaEncryption from './media_stream_encryption/media_stream_encryption';
+import PlayMedia from './play_media/play_media';
 
 // Initialize the Agora application ID, token, and channel name
 const appId = '<Your app ID>';
@@ -83,6 +84,13 @@ function App() {
         token = {token}
         title = '3D Spatial Audio'
         />;
+      case "mediaPlaying":
+      return <PlayMedia
+        appId = {appId}
+        channelName = {channelName}
+        token = {token}
+        title = 'Stream media to a channel'
+        />;
       default:
         return null;
     }
@@ -102,7 +110,7 @@ function App() {
         <option value="customMedia">Custom Video and Audio</option> 
         <option value="geofencing">Geofencing</option>
         <option value="spatialAudio">3D Spatial Audio</option>
- 
+        <option value="mediaPlaying">Stream media to a channel</option> 
       </select>
       {renderSelectedOption()}
     </div>
