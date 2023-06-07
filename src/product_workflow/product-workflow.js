@@ -1,196 +1,171 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import AgoraRTC from "agora-rtc-react";
 import AgoraManager from "../AgoraManager/AgoraManager";
 import VideoCallUI from "../AgoraManager/AgoraUI";
-import AgoraRTC from "agora-rtc-react";
 
-const appId = '';
-const channelName = '';
-const token = '';
+const ProductWorkflowComponent = (props) => {
+  // State variables
+  const [isSharingEnabled, setSharingEnabled] = useState(false);
+  const [isMuteVideo, setMuteVideo] = useState(false);
+  const [screenTrack, setScreenTrack] = useState(null);
+  const [agoraEngine,setAgoraEngine] = useState(null);
+  const [initialized, setInitialized] = useState(false);
 
-class ProductWorkflowComponent extends AgoraManager {
-  constructor(props) 
+  // Initialize AgoraManager instance
+  const agoraManager = AgoraManager({
+    appId: props.appId || "",
+    channelName: props.channelName || "",
+    token: props.token || ""
+  });
+
+  // Run this effect only once on component mount
+  useEffect(() => {
+    setupVideoSDKEngine(); // Initialize Agora SDK engine
+  });
+
+  // Initialize Agora SDK engine for video
+  const setupVideoSDKEngine = async () => {
+    if (!initialized) {
+      var engine =  await agoraManager.setupVideoSDKEngine();
+      if (engine !== null) {
+        setInitialized(true);
+        setAgoraEngine(engine);
+        await setupDeviceManager();
+      }
+    }
+  };
+
+  const setupDeviceManager = async () => 
   {
-    super(props);
-    this.state = 
+    if (agoraEngine) 
     {
-      isSharingEnabled: false,
-      isMuteVideo: false,
-      screenTrack: null,
-      remoteAudioTrack: null
-    };
-    this.screenTrackRef = React.createRef();
-  }
-
-  async componentDidMount() 
-  {
-    // If props values are not available or empty, use local variables
-    if(this.props.appId && this.props.channelName && this.props.token)
-    {
-      this.setState({
-        appId: this.props.appId,
-        channelName: this.props.channelName,
-        token: this.props.token
-      });
-    }
-    else if(appId && channelName && token)
-    {
-      this.setState({
-        appId: appId,
-        channelName: channelName,
-        token: token
-      });
-    }
-    else{
-      console.log('You did not specify appId, channelName, and token');
-    }
-
-    const { agoraEngine } = this.state;
-    if (agoraEngine == null) {
-      console.log("Init Engine");
-      await this.setupVideoSDKEngine();
-      await this.setupDeviceManager();
-    }
-  }
-
-  async setupDeviceManager() {
-    const { agoraEngine, localAudioTrack, localVideoTrack } = this.state;
-    if (agoraEngine) {
       // Handle microphone change event
       agoraEngine.onMicrophoneChanged = async (changedDevice) => {
         if (changedDevice.state === "ACTIVE") {
-          localAudioTrack.setDevice(changedDevice.device.deviceId);
-        } else if (changedDevice.device.label === localAudioTrack.getTrackLabel()) {
+          agoraManager.localAudioTrack.setDevice(changedDevice.device.deviceId);
+        } else if (changedDevice.device.label === agoraManager.localAudioTrack.getTrackLabel()) {
           const oldMicrophones = await agoraEngine.getMicrophones();
-          oldMicrophones[0] && localAudioTrack.setDevice(oldMicrophones[0].deviceId);
+          oldMicrophones[0] && agoraManager.localAudioTrack.setDevice(oldMicrophones[0].deviceId);
         }
-      };
+    };
 
       // Handle camera change event
       agoraEngine.onCameraChanged = async (changedDevice) => {
         if (changedDevice.state === "ACTIVE") {
-          localVideoTrack.setDevice(changedDevice.device.deviceId);
-        } else if (changedDevice.device.label === localVideoTrack.getTrackLabel()) {
+          agoraManager.localVideoTrack.setDevice(changedDevice.device.deviceId);
+        } else if (changedDevice.device.label === agoraManager.localVideoTrack.getTrackLabel()) {
           const oldCameras = await agoraEngine.getCameras();
-          oldCameras[0] && localVideoTrack.setDevice(oldCameras[0].deviceId);
+          oldCameras[0] && agoraManager.localVideoTrack.setDevice(oldCameras[0].deviceId);
         }
       };
     }
   }
 
-  shareScreen = async () => {
-    const {
-      localVideoTrack,
-      isSharingEnabled,
-      microphoneAndCameraTracks,
-      screenTrack
-    } = this.state;
+  const shareScreen = async () => {
 
     if (isSharingEnabled === false) {
       // Create a screen track for screen sharing
       const newScreenTrack = await AgoraRTC.createScreenVideoTrack();
-      this.setState({
-        isSharingEnabled: true,
-        screenTrack: newScreenTrack,
-      });
+      setScreenTrack(newScreenTrack);
 
       // Replace the localVideoTrack with the screenTrack
       const screenStreamTrack = newScreenTrack.getMediaStreamTrack();
-      localVideoTrack.replaceTrack(screenStreamTrack);
+      agoraManager.localVideoTrack.replaceTrack(screenStreamTrack);
+      setSharingEnabled(true);
     } else {
       // Stop screen sharing and switch back to the camera track
       screenTrack.close();
-      const videoStreamTrack = microphoneAndCameraTracks[1].getMediaStreamTrack();
-      localVideoTrack.replaceTrack(videoStreamTrack);
-      this.setState({
-        isSharingEnabled: false,
-        screenTrack: null
-      });
+      let cameraVideoTrack = AgoraRTC.createCameraVideoTrack();
+      agoraManager.localVideoTrack = cameraVideoTrack;
+      setSharingEnabled(false);
+      setScreenTrack(null);
+
     }
   };
 
-  muteVideo = async () => {
-    const { isMuteVideo, localVideoTrack } = this.state;
+const muteVideo = async () => {
     if (isMuteVideo === false) {
       // Mute the local video
-      localVideoTrack.setEnabled(false);
-      this.setState({ isMuteVideo: true });
+      agoraManager.localVideoTrack.setEnabled(false);
+      setMuteVideo(true);
     } else {
       // Unmute the local video
-      localVideoTrack.setEnabled(true);
-      this.setState({ isMuteVideo: false });
+      agoraManager.localVideoTrack.setEnabled(true);
+      setMuteVideo(false);
     }
   };
 
-  handleLocalAudioVolumeChange = (evt) => {
-    const { localAudioTrack } = this.state;
+const handleLocalAudioVolumeChange = (evt) => 
+{
     const volume = parseInt(evt.target.value);
     console.log('Volume of local audio:', volume);
-    localAudioTrack.setVolume(volume);
+    agoraManager.localAudioTrack.setVolume(volume);
   };
 
-  handleRemoteAudioVolumeChange = (evt) => {
-    const { remoteAudioTrack } = this.state;
-    if (remoteAudioTrack) {
+  const handleRemoteAudioVolumeChange = (evt) => 
+  {
+    if (agoraManager.remoteAudioTrack) {
       const volume = parseInt(evt.target.value);
       console.log('Volume of remote audio:', volume);
-      remoteAudioTrack.setVolume(volume);
+      agoraManager.remoteAudioTrack.setVolume(volume);
     } else {
       console.log('No remote user in the channel');
     }
   };
 
-  handleJoinCall = async () => {
-    await this.joinCall();
+  // Handler for leaving a call
+  const handleLeaveCall = async () => {
+    await agoraManager.leaveCall();
+    if(screenTrack)
+    {
+        screenTrack.close();
+        setScreenTrack(null);
+    }
+    if(isSharingEnabled)
+    {
+        setSharingEnabled(false);
+    }
   };
 
-  handleLeaveCall = async () => {
-    await this.leaveCall();
+  // Handler for joining a call
+  const handleJoinCall = async () => {
+    await agoraManager.joinCall();
   };
+    
 
-  render() {
-    const {
-      joined,
-      showVideo,
-      localVideoTrack,
-      remoteVideoTrack,
-      isSharingEnabled,
-      isMuteVideo
-    } = this.state;
-
-    return (
-      <div>
-        <VideoCallUI
-          title={this.props.title}
-          joined={joined}
-          showVideo={showVideo}
-          localVideoTrack={localVideoTrack}
-          remoteVideoTrack={remoteVideoTrack}
-          handleJoinCall={this.handleJoinCall}
-          handleLeaveCall={this.handleLeaveCall}
-          additionalContent={
+  return (
+    <div>
+      <VideoCallUI
+        title={props.title}
+        joined={agoraManager.joined}
+        showVideo={agoraManager.showVideo}
+        localVideoTrack={agoraManager.localVideoTrack}
+        remoteVideoTrack={agoraManager.remoteVideoTrack}
+        handleJoinCall={handleJoinCall}
+        handleLeaveCall={handleLeaveCall}
+        additionalContent={
             <div>
-              {isSharingEnabled ?
-                <button type="button" onClick={this.shareScreen}>Stop Sharing</button> :
-                <button type="button" onClick={this.shareScreen}>Share Screen</button>
-              }
-              {isMuteVideo ?
-                <button type="button" onClick={this.muteVideo}>Unmute Video</button> :
-                <button type="button" onClick={this.muteVideo}>Mute Video</button>
-              }
-              <div>
-                <label> Local Audio Level :</label>
-                <input type="range" min="0" max="100" step="1" onChange={this.handleLocalAudioVolumeChange} />
-              </div>
-              <div>
-                <label> Remote Audio Level :</label>
-                <input type="range" min="0" max="100" step="1" onChange={this.handleRemoteAudioVolumeChange} />
-              </div>
+            {isSharingEnabled ?
+              <button type="button" onClick={shareScreen}>Stop Sharing</button> :
+              <button type="button" onClick={shareScreen}>Share Screen</button>
+            }
+            {isMuteVideo ?
+              <button type="button" onClick={muteVideo}>Unmute Video</button> :
+              <button type="button" onClick={muteVideo}>Mute Video</button>
+            }
+            <div>
+              <label> Local Audio Level :</label>
+              <input type="range" min="0" max="100" step="1" onChange={handleLocalAudioVolumeChange} />
             </div>
-          }
-        />
-      </div>
-    );
-  }
-}
+            <div>
+              <label> Remote Audio Level :</label>
+              <input type="range" min="0" max="100" step="1" onChange={handleRemoteAudioVolumeChange} />
+            </div>
+          </div>
+        }
+      />
+    </div>
+  );
+};
 
-export default ProductWorkflowComponent;
+export default ProductWorkflowComponent

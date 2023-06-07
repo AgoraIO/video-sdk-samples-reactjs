@@ -1,25 +1,30 @@
-# Call quality
+# Cloud Proxy
 
-Customer satisfaction for your Video Calling integrated app depends on the quality of video and audio it provides. Quality of audiovisual communication through your app is affected by the following factors:
+You use Agora Cloud Proxy to ensure reliable connectivity for your users when they connect from an environment with a restricted network.
 
-- Bandwidth of network connection: Bandwidth is the volume of information that an Internet connection can handle per unit of time. When the available bandwidth is not sufficient to transmit the amount of data necessary to provide the desired video quality, your users see jerky or frozen video along with audio that cuts in and out.
 
-- Stability of network connection: Network connections are often unstable with the network quality going up and down. Users get temporarily disconnected and come back online after an interruption. These issues lead to a poor audiovisual experience for your users unless your app is configured to respond to these situations and take remedial actions.
+## Understand the tech of Cloud Proxy
 
-- Hardware quality: The camera and microphone used to capture video and audio must be of sufficiently good quality. If the user's hardware does not capture the audiovisual information in suitably high definition, it limits the quality of audio and video that is available to the remote user.
+Agora recommends upgrading to the latest SDK version, which supports all three operating modes:
 
-- Video and audio settings: The sharpness, smoothness, and overall quality of the video is directly linked to the frame rate, bitrate and other video settings. Similarly, the audio quality depends on the sample rate, bitrate, number of channels and other audio parameters. If you do not choose proper settings, the audio and video transmitted are of poor quality. On the other hand, if the settings are too demanding, the available bandwidth quickly gets choked, leading to suboptimal experience for your users.
+* Video SDK for Web v4.13.0
+To accommodate your end users’ firewall settings and business needs, Cloud Proxy offers the following operating modes:
 
-- Echo: Echo is produced when your audio signal is played by a remote user through a speakerphone or an external device. This audio is captured by the remote user's microphone and sent back to you. Echo negatively affects audio quality, making speech difficult to understand.
+* Automatic
 
-- Multiple users in a channel: When multiple users engage in real-time audio and video communication in a channel, the available bandwidth is quickly used up due to several incoming audio and video streams. The device performance also deteriorates due to the excessive workload required to decode and render multiple video streams.
+  The default setting. In the Automatic mode of Cloud Proxy, Video SDK first attempts a direct connection to Agora SD-RTN™; if the attempt fails, Video SDK automatically falls back and sends media securely on TLS 443. This is best practice when you are not sure if your end users are behind a firewall. Sending media over TLS 443 may not have as high quality UDP. However, a connection on TLS 443 works through most firewalls.
 
-- Latency: Latency is the time it takes for a single video frame to transfer from the sender's camera to the receiver's display. Network routers are the most common cause of latency on the end-to-end path. Satellite communication also adds significant latency to audio and video streaming.
+* Force UDP
 
-This sample project shows you how to use Video SDK features to account for these factors and ensure optimal audio and video quality in your app.
+  In the Force UDP mode of Cloud Proxy, Video SDK securely sends media over UDP only. Your end users’ firewall must be configured to trust a list of [allowed IP address](https://docs.agora.io/en/video-calling/reference/cloud-proxy-allowed-ips?platform=web). This is best practice when your end users are behind a firewall and require media with the highest possible quality. This mode does not support pushing streams to the CDN or relaying streams across channels.
+
+* Force TCP
+
+  In the Force TCP mode of Cloud Proxy, Video SDK securely sends media over TLS 443 only. This is best practice when your end users are behind a firewall and the firewall’s security policies only allow media to flow through TLS 443. In some cases the firewall might trust any traffic over TLS 443. However, in many cases the firewall is configured to trust only a specific range of IP addresses sending traffic over TLS 443. In this case, your end user’s firewall must be configured to trust a list of [allowed IP address](https://docs.agora.io/en/video-calling/reference/cloud-proxy-allowed-ips?platform=web). Media quality might be impacted if network conditions degrade.
+
 
 ## Full Documentation
 
-[Agora's full call quality guide](https://docs.agora.io/en/video-calling/develop/ensure-channel-quality?platform=web)
+[Agora's cloud proxy guide](https://docs.agora.io/en/video-calling/develop/cloud-proxy?platform=web)
 
 

@@ -1,76 +1,64 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import AgoraRTC from "agora-rtc-react";
 import AgoraManager from "../AgoraManager/AgoraManager";
 import VideoCallUI from "../AgoraManager/AgoraUI";
-import AgoraRTC from "agora-rtc-react";
 
-const appId = ''; // Agora App ID
-const channelName = ''; // Name of the channel to join
-const token = ''; // Token for authentication
-class EnsureCallQuality extends AgoraManager {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isHighRemoteVideoQuality: false,
-      isDeviceTestRunning: false,
-      audioDevices: [],
-      videoDevices: [],
-    };
-  }
+const CallQualityComponent = (props) => {
+  // State variables
+  const [isDeviceTestRunning, setDeviceTestRunning] = useState(false);
+  const [audioDevices, setAudioDevices] = useState([]);
+  const [videoDevices, setVideoDevices] = useState([]);
+  const [agoraEngine, setAgoraEngine] = useState(null);
+  const [initialized, setInitialized] = useState(false);
 
-  async componentDidMount() {
-    if(this.props.appId && this.props.channelName && this.props.token)
+  // Initialize AgoraManager instance
+  const agoraManager = AgoraManager({
+    appId: props.appId || "",
+    channelName: props.channelName || "",
+    token: props.token || ""
+  });
+
+  // Run this effect only once on component mount
+  useEffect(() => {
+    setupVideoSDKEngine(); // Initialize Agora SDK engine
+  });
+
+
+
+  // Initialize Agora SDK engine for video
+  const setupVideoSDKEngine = async () => {
+    if (!initialized) 
     {
-      this.setState({
-        appId: this.props.appId,
-        channelName: this.props.channelName,
-        token: this.props.token
-      });
+      const engine =  await agoraManager.setupVideoSDKEngine();
+      setAgoraEngine(engine);
+      if (agoraEngine) {
+        setInitialized(true);
+        enableCallQualityFeatures(); // Enable call quality features
+        getAudioAndVideoDevices(); // Fetch available audio and video devices
+      }
     }
-    else if(appId && channelName && token)
-    {
-      this.setState({
-        appId: appId,
-        channelName: channelName,
-        token: token
-      });
-    }
-    else{
-      console.log('You did not specify appId, channelName, and token');
-    }
-    if(appId !== "")
-    {
-      this.setState({
-        appId: appId,
-        channelName: channelName,
-        token: token
-      });
-    }
-    const {agoraEngine} = this.state;
-    if (!agoraEngine) {
-      console.log("Init Engine");
-      await this.setupVideoSDKEngine(); // Set up the video SDK engine
-      this.enableCallQualityFeatures(); // Enable call quality features
-      this.getAudioAndVideoDevices(); // Get available audio and video devices
-    }
-  }
-  
-  async getAudioAndVideoDevices() {
+  };
+
+  // Handler for joining a call
+  const handleJoinCall = async () => {
+    await agoraManager.joinCall();
+  };
+
+  // Fetch available audio and video devices
+  const getAudioAndVideoDevices = async () => {
     try {
       const devices = await AgoraRTC.getDevices();
       const audioDevices = devices.filter(device => device.kind === "audioinput");
       const videoDevices = devices.filter(device => device.kind === "videoinput");
-      this.setState({
-        audioDevices: audioDevices,
-        videoDevices: videoDevices
-      });
+      setAudioDevices(audioDevices);
+      setVideoDevices(videoDevices);
     } catch (error) {
       console.log("Error getting audio and video devices:", error);
     }
-  }
+  };
 
   // Enable call quality features
-  async enableCallQualityFeatures() {
-    const { agoraEngine } = this.state;
+  const enableCallQualityFeatures = async () => {
     if (agoraEngine) {
       const localVideoTrack = await AgoraRTC.createCameraVideoTrack({
         encoderConfig: {
@@ -84,14 +72,10 @@ class EnsureCallQuality extends AgoraManager {
       });
 
       const localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack({ encoderConfig: "high_quality_stereo" });
-      agoraEngine.enableDualStream(); // Enable dual stream for the client
+      agoraEngine.enableDualStream();
+      agoraManager.setMicrophoneAndCameraTracks([localAudioTrack, localVideoTrack]);
 
-      this.setState({
-        localVideoTrack: localVideoTrack,
-        microphoneAndCameraTracks: [localAudioTrack, localVideoTrack]
-      });
-
-      // Event listeners for connection state change and network quality
+      // Event listeners for connection state change, network quality, and user-published
       agoraEngine.on("connection-state-change", (curState, prevState, reason) => {
         console.log("Connection state has changed to: " + curState);
         console.log("Connection state was: " + prevState);
@@ -99,6 +83,7 @@ class EnsureCallQuality extends AgoraManager {
       });
 
       agoraEngine.on("network-quality", (quality) => {
+        // Update network quality UI
         const upLinkIndicator = document.getElementById("QIndicator");
         if (quality.uplinkNetworkQuality === 1) {
           upLinkIndicator.innerHTML = "Network: Excellent";
@@ -112,129 +97,113 @@ class EnsureCallQuality extends AgoraManager {
         }
       });
 
-      // Event listener for user-published event
       agoraEngine.on("user-published", async (user, mediaType) => {
         if (mediaType === "video") {
-          agoraEngine.setStreamFallbackOption(user.uid, 1); // Set stream fallback option for video
+          agoraEngine.setStreamFallbackOption(user.uid, 1);
         }
       });
     }
-  }
+  };
 
-  // Display statistics
-  showStatistics = async () => {
-    const { agoraEngine, remoteUid } = this.state;
+  // Show call statistics
+  const showStatistics = async () => {
     if (agoraEngine) {
-      // Display local audio, video, and channel statistics
       const localAudioStats = agoraEngine.getLocalAudioStats();
-      console.log("Local audio stats = { sendBytes :" + localAudioStats.sendBytes + ", sendBitrate :" + localAudioStats.sendBitrate + ", sendPacketsLost :" + localAudioStats.sendPacketsLost + " }");
-      const localVideoStats = agoraEngine.getLocalVideoStats();
-      console.log("Local video stats = { sendBytes :" + localVideoStats.sendBytes + ", sendBitrate :" + localVideoStats.sendBitrate + ", sendPacketsLost :" + localVideoStats.sendPacketsLost + " }");
-      const rtcStats = agoraEngine.getRTCStats();
-      console.log("Channel statistics = { UserCount :" + rtcStats.UserCount + ", OutgoingAvailableBandwidth :" + rtcStats.OutgoingAvailableBandwidth + ", RTT :" + rtcStats.RTT + " }");
+      console.log(localAudioStats);
+      // Log local audio stats
 
-      if (remoteUid === null) {
-        // Display remote audio and video statistics
-        const remoteAudioStats = agoraEngine.getRemoteAudioStats()[remoteUid];
-        console.log("Remote audio stats = { receiveBytes :" + remoteAudioStats.receivedBytes + ", receiveBitrate :" + remoteAudioStats.receiveBitrate + ", receivePacketsLost :" + remoteAudioStats.receivePacketsLost + " }");
-        const remoteVideoStats = agoraEngine.getRemoteVideoStats()[remoteUid];
-        console.log("Local video stats = { receiveBytes :" + remoteVideoStats.receiveBytes + ", receiveBitrate :" + remoteVideoStats.receiveBitrate + ", receivePacketsLost :" + remoteVideoStats.receivePacketsLost + " }");
+      const localVideoStats = agoraEngine.getLocalVideoStats();
+      console.log(localVideoStats);
+      // Log local video stats
+
+      const rtcStats = agoraEngine.getRTCStats();
+      console.log(rtcStats);
+      // Log channel statistics
+
+      if (agoraManager.remoteUid !== null) {
+        const remoteAudioStats = agoraEngine.getRemoteAudioStats()[agoraManager.remoteUid];
+        console.log(remoteAudioStats);
+        // Log remote audio stats
+
+        const remoteVideoStats = agoraEngine.getRemoteVideoStats()[agoraManager.remoteUid];
+        console.log(remoteVideoStats);
+        // Log remote video stats
       } else {
         console.log("To view statistics of remote users, click 'Show Statistics' when a remote user joins the channel");
       }
+    } else {
+      console.log("Local Agora engine not initialized");
     }
-  }
-
-  // Join call handler
-  handleJoinCall = async () => {
-    await this.joinCall();
   };
 
-  // Start/Stop device test handler
-  startDeviceTest = async () => {
-    const { agoraEngine, joined, isDeviceTestRunning, microphoneAndCameraTracks, videoDevices, audioDevices } = this.state;
-
-    if (!joined) {
+  // Start or stop testing audio/video devices
+  const startDeviceTest = async () => {
+    if (!agoraManager.joined) {
       console.log("Join a channel to test your audio/video devices");
       return;
     }
 
-    // Create tracks using the selected devices and publish tracks in the channel.
-    if (!isDeviceTestRunning) 
-    {
+    if (!isDeviceTestRunning) {
       const videoTrack = await AgoraRTC.createCameraVideoTrack({ cameraId: videoDevices[0].deviceId });
       const audioTrack = await AgoraRTC.createMicrophoneAudioTrack({ microphoneId: audioDevices[0].deviceId });
+
       await agoraEngine.unpublish();
-
-      this.setState({
-        microphoneAndCameraTracks: [audioTrack, videoTrack],
-        isDeviceTestRunning: true
-      });
-
-      await agoraEngine.publish(microphoneAndCameraTracks);
-    } else 
-    {
-      console.log(false);
+      agoraEngine.publish([audioTrack, videoTrack]);
+      setDeviceTestRunning(true);
+    } else {
       await agoraEngine.unpublish();
-      this.setState({
-        isDeviceTestRunning: false,
-        microphoneAndCameraTracks: await AgoraRTC.createMicrophoneAndCameraTracks()
-      });
-
-      await agoraEngine.publish(microphoneAndCameraTracks);
+      setDeviceTestRunning(false);
+      await agoraEngine.publish(agoraManager.microphoneAndCameraTracks);
     }
-  }
-
-  // Leave call handler
-  handleLeaveCall = async () => {
-    await this.leaveCall();
   };
 
-  render() {
-    const { joined, audioDevices, videoDevices,showVideo, localVideoTrack, remoteVideoTrack, isDeviceTestRunning } = this.state;
+  // Handler for leaving a call
+  const handleLeaveCall = async () => {
+    await agoraManager.leaveCall();
+  };
 
-    return (
-      <div>
-        <VideoCallUI
-          title={this.props.title}
-          joined={joined}
-          showVideo={showVideo}
-          localVideoTrack={localVideoTrack}
-          remoteVideoTrack={remoteVideoTrack}
-          handleJoinCall={this.handleJoinCall}
-          handleLeaveCall={this.handleLeaveCall}
-          additionalContent={
+  return (
+    <div>
+      <VideoCallUI
+        title={props.title}
+        joined={agoraManager.joined}
+        showVideo={agoraManager.showVideo}
+        localVideoTrack={agoraManager.localVideoTrack}
+        remoteVideoTrack={agoraManager.remoteVideoTrack}
+        handleJoinCall={handleJoinCall}
+        handleLeaveCall={handleLeaveCall}
+        additionalContent={
+          <div>
             <div>
-              <div>
-                <button type="button" id="statistics" onClick={this.showStatistics}>Show Statistics</button>
-                {isDeviceTestRunning ?
-                  <button type="button" id="testDevices" onClick={this.startDeviceTest}>Stop Device Test</button> :
-                  <button type="button" id="testDevices" onClick={this.startDeviceTest}>Start Device Test</button>
-                }
-              </div>
-              <div>
-                <label>Audio Input:</label>
-                <select id="audioDevicesDropdown">
-                  {audioDevices.map((device, index) => (
-                    <option key={index} value={device.deviceId}>{device.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label>Video Input:</label>
-                <select id="videoDevicesDropdown">
-                  {videoDevices.map((device, index) => (
-                    <option key={index} value={device.deviceId}>{device.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div id="QIndicator"></div>
+              <button type="button" id="statistics" onClick={showStatistics}>Show Statistics</button>
+              {isDeviceTestRunning ? (
+                <button type="button" id="testDevices" onClick={startDeviceTest}>Stop Device Test</button>
+              ) : (
+                <button type="button" id="testDevices" onClick={startDeviceTest}>Start Device Test</button>
+              )}
             </div>
-          }
-        />
-      </div>
-    );
-  }
-}
+            <div>
+              <label>Audio Input:</label>
+              <select id="audioDevicesDropdown">
+                {audioDevices.map((device, index) => (
+                  <option key={index} value={device.deviceId}>{device.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label>Video Input:</label>
+              <select id="videoDevicesDropdown">
+                {videoDevices.map((device, index) => (
+                  <option key={index} value={device.deviceId}>{device.label}</option>
+                ))}
+              </select>
+            </div>
+            <div id="QIndicator"></div>
+          </div>
+        }
+      />
+    </div>
+  );
+};
 
-export default EnsureCallQuality;
+export default CallQualityComponent
