@@ -13,7 +13,7 @@ Agora virtual background extension has the following features:
 | ---- | ---- |
 | Blurred background and image background   |   ![](https://web-cdn.agora.io/docs-files/1647325748630)   |
 | Video/Animated background   |   <video src="https://web-cdn.agora.io/docs-files/1654508267206" poster="https://web-cdn.agora.io/docs-files/1654571689670"  controls width="100%" height="auto">Your browser does not support the <code>video</code>  element.</video>   |
-| Portrait-in-picture   | ![portrait-in-picture](/portrait-in-picture.png) Allows the presenter to use slides as the virtual background while superimposing their video. The effect is similar to a weather news cast on television, preventing interruptions during a layout toggle.   |
+| Portrait-in-picture   | ![portrait-in-picture](../../public/portrait-in-picture.png) Allows the presenter to use slides as the virtual background while superimposing their video. The effect is similar to a weather news cast on television, preventing interruptions during a layout toggle.   |
 
 Want to test <Vg k="RTEE_VB" />? Try the <a href="https://webdemo.agora.io/virtualBackground/index.html">online demo</a>.
 
