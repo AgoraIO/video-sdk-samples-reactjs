@@ -1,66 +1,74 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AgoraManager from "../AgoraManager/AgoraManager";
 import VideoCallUI from "../AgoraManager/AgoraUI";
-import { SpatialAudioExtension } from 'agora-extension-spatial-audio';
-import AgoraRTC from 'agora-rtc-react';
+import AgoraRTC from "agora-rtc-react";
+import { SpatialAudioExtension } from "agora-extension-spatial-audio";
 
-// ...imports
+// Initialize the Agora application ID, token, and channel name
+const appId = "";
+const channelName = "";
+const token = "";
+let spatialSetupComplete = false;
 
-const appId = ''; // Agora App ID
-const channelName = ''; // Name of the channel to join
-const token = ''; // Token for authentication
+const SpatialAudio = (props) => {
+  const agoraManager = AgoraManager({
+    appId: props.appId || appId,
+    channelName: props.channelName || channelName,
+    token: props.token || token
+  });
 
-class CustomSpatialAudioManager extends AgoraManager {
-  constructor(props) {
-    super(props);
-    this.state = {
-      distance: 0,
-      isMediaPlaying: false,
-      processors: null,
-      spatialAudioExtension: null,
-      mediaPlayerTrack: null, // A variable to hold the media file track.
-    };
-  }
+  const [initialized, setInitialized] = useState(false);
+  const [distance, setDistance] = useState(0);
+  const [isMediaPlaying, setMediaPlaying] = useState(false);
+  const [processors, setProcessors] = useState(null);
+  const [spatialAudioExtension, setSpatialAudioExtension] = useState(null);
+  const [mediaPlayerTrack, setMediaPlayerTrack] = useState(null);
+  const [agoraEngine, setAgoraEngine] = useState(null);
 
-  async componentDidMount() {
-    if (this.props.appId && this.props.channelName && this.props.token) {
-      this.setState({
-        appId: this.props.appId,
-        channelName: this.props.channelName,
-        token: this.props.token
-      });
-    } else if (appId && channelName && token) {
-      this.setState({
-        appId: appId,
-        channelName: channelName,
-        token: token
-      });
-    } else {
-      console.log('You did not specify appId, channelName, and token');
-    }
+  useEffect(() => {
+    setupVideoSDKEngine(); // Initialize Agora SDK engine
+  }, []);
 
-    if (!this.state.agoraEngine) {
-      console.log("Init Engine");
-      await this.setupVideoSDKEngine(); // Set up the video SDK engine
-
-      if (this.state.agoraEngine) {
-        this.state.agoraEngine.on("user-published", this.handleUserPublished);
+  // Initialize Agora SDK engine for video
+  const setupVideoSDKEngine = async () => {
+    if (!initialized) {
+      const engine = await agoraManager.setupVideoSDKEngine();
+      if (engine) {
+        engine.on("user-published", handleUserPublished);
       }
+      setInitialized(true);
+      setAgoraEngine(engine);
+      await setupSpatial();
     }
-    await this.setupSpatial();
-  }
+  };
+
+  const handleJoinCall = async () => {
+    await agoraManager.joinCall();
+  };
+
+  const increaseDistance = () => {
+    setDistance(distance + 5);
+    updatePosition();
+  };
+
+  const setupSpatial = async () => {
+    if (!spatialSetupComplete) {
+      console.log("initialized");
+      const processors = new SpatialAudioExtension({ assetsPath: '../../node_modules/agora-extension-spatial-audio/external/' });
+      setProcessors(new Map());
+      setSpatialAudioExtension(processors);
+      AgoraRTC.registerExtensions([processors]);
+      spatialSetupComplete = true;
+    }
+  };
 
   // Event handler for when a user with audio is published
-  handleUserPublished = async (user, mediaType) => {
-    if (this.state.spatialAudioExtension) {
-      const processor = this.state.spatialAudioExtension._createProcessor();
-
+  const handleUserPublished = async (user, mediaType) => {
+    if (spatialAudioExtension && !spatialAudioExtension) {
+      const processor = spatialAudioExtension._createProcessor();
       if (user.hasAudio) {
-        this.setState(prevState => ({
-          processors: new Map(prevState.processors).set(user.uid.toString(), processor)
-        }));
-
-        // Inject the SpatialAudioProcessor into the audio track
+        setProcessors(new Map(processors).set(user.uid.toString(), processor));
+        // Inject the SpatialAudioProcessor into the remote user's audio track
         const track = user.audioTrack;
         track.pipe(processor).pipe(track.processorDestination);
         // Play the remote audio track.
@@ -69,57 +77,46 @@ class CustomSpatialAudioManager extends AgoraManager {
     }
   };
 
-  setupSpatial = async () => {
-    if (!this.state.spatialAudioExtension) {
-      const processors = new SpatialAudioExtension({ assetsPath: '../../node_modules/agora-extension-spatial-audio/external/' });
-      this.setState({
-        processors: new Map(),
-        spatialAudioExtension: processors
-      });
-      AgoraRTC.registerExtensions([processors]);
-    }
-  }
-
-  decreaseDistance = () => {
-    this.setState(prevState => ({ distance: prevState.distance - 5 }));
-    this.updatePosition();
+  const decreaseDistance = () => {
+    setDistance(distance - 5);
+    updatePosition();
   };
 
-  updatePosition = () => {
-    if (this.state.isMediaPlaying) {
-      const processor = this.state.processors.get("media-player");
+  const updatePosition = () => {
+    if (isMediaPlaying) {
+      const processor = processors.get("media-player");
       processor.updatePlayerPositionInfo({
-        position: [this.state.distance, 0, 0],
+        position: [distance, 0, 0],
         forward: [1, 0, 0],
       });
     }
-    if (this.state.remoteUid) {
-      const processor = this.state.processors.get(this.state.remoteUid);
+    if (agoraManager.remoteUid) {
+      const processor = processors.get(agoraManager.remoteUid);
       processor.updateRemotePosition({
-        position: [this.state.distance, 0, 0],
+        position: [distance, 0, 0],
         forward: [1, 0, 0],
       });
     }
   };
 
-  increaseDistance = () => {
-    this.setState(prevState => ({ distance: prevState.distance + 5 }));
-    this.updatePosition();
+  const handleLeaveCall = async () => {
+    if (isMediaPlaying) {
+      mediaPlayerTrack.setEnabled(false);
+      setMediaPlaying(false);
+    }
+    await agoraManager.leaveCall();
   };
 
-  localPlayerStart = async () => {
-    if (this.state.isMediaPlaying) {
-      this.state.mediaPlayerTrack.setEnabled(false);
-      this.setState({ isMediaPlaying: false,
-      mediaPlayerTrack: null });
+  const localPlayerStart = async () => {
+    if (isMediaPlaying) {
+      mediaPlayerTrack.setEnabled(false);
+      setMediaPlaying(false);
+      setMediaPlayerTrack(null);
+      agoraEngine.unpublish(mediaPlayerTrack);
       return;
     }
-
-    const processor = this.state.spatialAudioExtension.createProcessor();
-    this.setState(prevState => ({
-      processors: new Map(prevState.processors).set("media-player", processor)
-    }));
-
+    const processor = spatialAudioExtension.createProcessor();
+    setProcessors(new Map(processors).set("media-player", processor));
     const track = await AgoraRTC.createBufferSourceAudioTrack({
       cacheOnlineFile: false,
       source: "/sampleFile.wav",
@@ -137,64 +134,45 @@ class CustomSpatialAudioManager extends AgoraManager {
     track.startProcessAudioBuffer({ loop: true });
     track.pipe(processor).pipe(track.processorDestination);
     track.play();
-
-    this.setState({ isMediaPlaying: true, mediaPlayerTrack: track });
+    agoraEngine.publish(track);
+    setMediaPlayerTrack(track);
+    setMediaPlaying(true);
   };
 
-  // Event handler for leaving the call
-  handleLeaveCall = async () => {
-    if (this.state.isMediaPlaying) {
-      this.state.mediaPlayerTrack.setEnabled(false);
-      this.setState({ isMediaPlaying: false });
-    }
-    await this.leaveCall();
-  };
+  return (
+    <div>
+      <VideoCallUI
+        title={props.title}
+        joined={agoraManager.joined}
+        showVideo={agoraManager.showVideo}
+        localVideoTrack={agoraManager.localVideoTrack}
+        remoteVideoTrack={agoraManager.remoteVideoTrack}
+        handleJoinCall={handleJoinCall}
+        handleLeaveCall={handleLeaveCall}
+        additionalContent={
+          <div>
+            <p>
+              {isMediaPlaying ? (
+                <button type="button" onClick={localPlayerStart}>
+                  Stop audio file
+                </button>
+              ) : (
+                <button type="button" onClick={localPlayerStart}>
+                  Play audio file
+                </button>
+              )}
+            </p>
+            <p>
+              Distance:
+              <button type="button" onClick={decreaseDistance}>-</button>
+              <label>{distance}</label>
+              <button type="button" onClick={increaseDistance}>+</button>
+            </p>
+          </div>
+        }
+      />
+    </div>
+  );
+};
 
-  // Event handler for joining the call
-  handleJoinCall = async () => {
-    await this.joinCall();
-  };
-
-  render() {
-    const {
-      joined,
-      showVideo,
-      localVideoTrack,
-      remoteVideoTrack,
-      distance,
-      isMediaPlaying
-    } = this.state;
-
-    return (
-      <div>
-        <VideoCallUI
-          title={this.props.title}
-          joined={joined}
-          showVideo={showVideo}
-          localVideoTrack={localVideoTrack}
-          remoteVideoTrack={remoteVideoTrack}
-          handleJoinCall={this.handleJoinCall}
-          handleLeaveCall={this.handleLeaveCall}
-          additionalContent={
-            <div>
-              <p>
-                {isMediaPlaying ?
-                  <button type="button" onClick={this.localPlayerStart}>Stop audio file</button> :
-                  <button type="button" onClick={this.localPlayerStart}>Play audio file</button>
-                }
-              </p>
-              <p>
-                Distance:
-                <button type="button" onClick={this.decreaseDistance}>-</button>
-                <label>{distance}</label>
-                <button type="button" onClick={this.increaseDistance}>+</button>
-              </p>
-            </div>
-          }
-        />
-      </div>
-    );
-  }
-}
-
-export default CustomSpatialAudioManager;
+export default SpatialAudio;

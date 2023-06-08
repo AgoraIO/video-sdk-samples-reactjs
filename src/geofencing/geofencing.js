@@ -1,71 +1,58 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AgoraManager from "../AgoraManager/AgoraManager";
 import VideoCallUI from "../AgoraManager/AgoraUI";
 import AgoraRTC from "agora-rtc-react";
+
 // Initialize the Agora application ID, token, and channel name
-var appId = '';
-var channelName = '';
-var token = '';
+const appId = "";
+const channelName = "";
+const token = "";
 
-// VideoCall class inherits from AgoraManager
-class VideoCall extends AgoraManager {
-  async componentDidMount() {
-    if(this.props.appId && this.props.channelName && this.props.token)
-    {
-      this.setState({
-        appId: this.props.appId,
-        channelName: this.props.channelName,
-        token: this.props.token
-      });
-    }
-    else if(appId && channelName && token)
-    {
-      this.setState({
-        appId: appId,
-        channelName: channelName,
-        token: token
-      });
-    }
-    else{
-      console.log('You did not specify appId, channelName, and token');
-    }
+const GeoFencing = (props) => {
+  const agoraManager = AgoraManager({
+    appId: props.appId || appId,
+    channelName: props.channelName || channelName,
+    token: props.token || token
+  });
 
-    // Initialize the AgoraManager
-    await this.setupVideoSDKEngine();
-    if(this.state.agoraEngine)
-    {
-        // Your app will only connect to Agora SD-RTN located in North America.
-        AgoraRTC.setArea({areaCode:"NORTH_AMERICA"});
-        // You can use [] to include more than one region.
-    }
-  }
+  const [initialized, setInitialized] = useState(false);
 
-  // Handler for joining the video call
-  handleJoinCall = async () => {
-    await this.joinCall();
+  useEffect(() => {
+    setupVideoSDKEngine(); // Initialize Agora SDK engine
+  }, []);
+
+  // Initialize Agora SDK engine for video
+  const setupVideoSDKEngine = async () => {
+    if (!initialized) {
+      await agoraManager.setupVideoSDKEngine();
+      // Your app will only connect to Agora SD-RTN located in North America.
+      AgoraRTC.setArea({ areaCode: "NORTH_AMERICA" });
+      // You can use [] to include more than one region.
+      setInitialized(true);
+    }
   };
 
-  // Handler for leaving the video call
-  handleLeaveCall = async () => {
-    await this.leaveCall();
+  const handleJoinCall = async () => {
+    await agoraManager.joinCall();
   };
 
-  render() {
-    const { joined, showVideo, localVideoTrack, remoteVideoTrack } = this.state;
+  const handleLeaveCall = async () => {
+    await agoraManager.leaveCall();
+  };
 
-    return (
-      // Render the VideoCallUI component with the necessary props
+  return (
+    <div>
       <VideoCallUI
-        title={this.props.title}
-        joined={joined}
-        showVideo={showVideo}
-        localVideoTrack={localVideoTrack}
-        remoteVideoTrack={remoteVideoTrack}
-        handleJoinCall={this.handleJoinCall}
-        handleLeaveCall={this.handleLeaveCall}
+        title={props.title}
+        joined={agoraManager.joined}
+        showVideo={agoraManager.showVideo}
+        localVideoTrack={agoraManager.localVideoTrack}
+        remoteVideoTrack={agoraManager.remoteVideoTrack}
+        handleJoinCall={handleJoinCall}
+        handleLeaveCall={handleLeaveCall}
       />
-    );
-  }
-}
+    </div>
+  );
+};
 
-export default VideoCall;
+export default GeoFencing;

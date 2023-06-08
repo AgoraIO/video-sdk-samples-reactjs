@@ -6,6 +6,7 @@ import ProductWorkflow from './product_workflow/product-workflow';
 import CloudProxy from './cloud_proxy/cloud_proxy';
 import MediaEncryption from './media_stream_encryption/media_stream_encryption';
 import PlayMedia from './play_media/play_media';
+import VirtualBAckground from './virtual_background/virtual_background'
 
 // Initialize the Agora application ID, token, and channel name
 const appId = '<Your app ID>';
@@ -91,6 +92,13 @@ function App() {
         token = {token}
         title = 'Stream media to a channel'
         />;
+      case "virtualBackground":
+      return <VirtualBAckground
+        appId = {appId}
+        channelName = {channelName}
+        token = {token}
+        title = 'Use virtual background'
+      />;
       default:
         return null;
     }
@@ -111,6 +119,7 @@ function App() {
         <option value="geofencing">Geofencing</option>
         <option value="spatialAudio">3D Spatial Audio</option>
         <option value="mediaPlaying">Stream media to a channel</option> 
+        <option value="virtualBackground">Virtual Background</option> 
       </select>
       {renderSelectedOption()}
     </div>
