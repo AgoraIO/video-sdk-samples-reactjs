@@ -1,79 +1,84 @@
+import { useState } from "react";
 import AgoraRTC from "agora-rtc-react";
-import React from "react";
 
-class AgoraManager extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      agoraEngine: null,
-      microphoneAndCameraTracks: null,
-      joined: false,
-      appId: null,
-      token: null,
-      channelName: null,
-      localVideoTrack: null,
-      remoteVideoTrack: null,
-      localAudioTrack: null,
-      remoteAudioTrack: null,
-      showVideo: false,
-      uid: 0,
-      remoteUid: null
-    };
-  }
-  // Setup an instance of the agora SDK and create microphone and camera tracks.
-  async setupVideoSDKEngine() {
-    const agoraEngine = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
-    const microphoneAndCameraTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-    this.setState({
-      agoraEngine: agoraEngine,
-      microphoneAndCameraTracks: microphoneAndCameraTracks,
-      localAudioTrack: microphoneAndCameraTracks[0],
-      localVideoTrack: microphoneAndCameraTracks[1]
-    });
+const AgoraManager = ({ appId, channelName, token }) => {
+  const [agoraEngine, setAgoraEngine] = useState(null);
+  const [microphoneAndCameraTracks, setMicrophoneAndCameraTracks] = useState(null);
+  const [localAudioTrack, setLocalAudioTrack] = useState(null);
+  const [localVideoTrack, setLocalVideoTrack] = useState(null);
+  const [remoteVideoTrack, setRemoteVideoTrack] = useState(null);
+  const [remoteUid, setRemoteUid] = useState(null);
+  const [joined, setJoined] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
 
-    // Triggers when a remote user publishes the media stream in the channel. 
-    agoraEngine.on("user-published", async (user, mediaType) => {
-        await agoraEngine.subscribe(user, mediaType);
-        this.setState({ remoteVideoTrack: user.videoTrack, remoteAudioTrack: user.audioTrack, remoteUid:user.uid });
-    });
-    // Triggers when a remote user unpublishes the media stream in the channel. 
-    agoraEngine.on("user-unpublished", (user, mediaType) => {
+
+  const setupVideoSDKEngine = async () => 
+  {
+    const engine = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+    const tracks = await AgoraRTC.createMicrophoneAndCameraTracks();
+    if(engine && tracks)
+    {
+      setAgoraEngine(engine);
+      setMicrophoneAndCameraTracks(tracks);
+      engine.on("user-published", async (user, mediaType) => {
+      await engine.subscribe(user, mediaType);
       if (mediaType === "video") {
-        this.setState({ remoteVideoTrack: null, remoteUid: null });
+        setRemoteVideoTrack(user.videoTrack);
+        setRemoteUid(user.uid);
+      }
+    });
+
+    engine.on("user-unpublished", (user, mediaType) => {
+      if (mediaType === "video" && user.uid === remoteUid) {
+        setRemoteVideoTrack(null);
+        setRemoteUid(null);
       }
     });
   }
+  return engine;
+  };
 
-  // Function to join the channel.
-  async joinCall() {
+  const joinCall = async () => {
     try {
-      const { agoraEngine, microphoneAndCameraTracks, appId, channelName, token, uid } = this.state;
-      await agoraEngine.join(appId, channelName, token, uid);
-      await agoraEngine.publish(microphoneAndCameraTracks);
-      this.setState({
-        joined: true,
-        showVideo: true,
-      }, () => {
-        this.render();
-      });
+      await agoraEngine.join(appId, channelName, token, 0);
+      setLocalAudioTrack(microphoneAndCameraTracks[0]);
+      setLocalVideoTrack(microphoneAndCameraTracks[1]);
+      await agoraEngine.publish([microphoneAndCameraTracks[0], microphoneAndCameraTracks[1]]);
+      setJoined(true);
+      setShowVideo(true);
     } catch (error) {
       console.error("Failed to join or publish:", error);
     }
-  }
- // Function to leave the channel.
-  async leaveCall() {
+  };
+
+  const leaveCall = async () => {
     try {
-      const { agoraEngine, localAudioTrack, localVideoTrack } = this.state;
-      await agoraEngine.unpublish([localAudioTrack,localVideoTrack]);
+      await agoraEngine.unpublish([localAudioTrack, localVideoTrack]);
       await agoraEngine.leave();
-      this.setState({
-        joined: false,
-        showVideo: false,
-      });
+      setJoined(false);
+      setShowVideo(false);
     } catch (error) {
       console.error("Failed to unpublish or leave:", error);
     }
-  }
-}
+  };
+
+  return {
+    agoraEngine,
+    microphoneAndCameraTracks,
+    joined,
+    appId,
+    token,
+    channelName,
+    localVideoTrack,
+    remoteVideoTrack,
+    localAudioTrack,
+    remoteUid,
+    showVideo,
+    joinCall,
+    leaveCall,
+    setupVideoSDKEngine,
+    setMicrophoneAndCameraTracks
+  };
+};
 
 export default AgoraManager;

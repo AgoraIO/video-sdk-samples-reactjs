@@ -29,6 +29,19 @@ To run the sample projects in this folder, take the following steps:
     ```
 
 1. In `src/App.js`, replace `appID`, `channelName`, and `token` with your app ID, channel name , and authentication token.
+<<<<<<< HEAD
+=======
+
+
+1. Open a command prompt in the project folder, and run the following command:
+
+    ``` bash
+    npm start
+    ```
+    The project opens in your default browser.
+
+1. Select an item from the dropdown to test the sample codes.
+>>>>>>> 578cc4ae51b74ea0a585d28e2634dfa6cc348f40
 
 
 1. Open a command prompt in the project folder, and run the following command:

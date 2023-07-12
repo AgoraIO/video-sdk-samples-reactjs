@@ -1,65 +1,55 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import AgoraManager from "../AgoraManager/AgoraManager";
 import VideoCallUI from "../AgoraManager/AgoraUI";
 
 // Initialize the Agora application ID, token, and channel name
-var appId = '';
-var channelName = '';
-var token = '';
+const appId = "";
+const channelName = "";
+const token = "";
 
-// VideoCall class inherits from AgoraManager
-class VideoCall extends AgoraManager {
-  async componentDidMount() {
-    if(this.props.appId && this.props.channelName && this.props.token)
+const GetStartedComponent = (props) => {
+  const agoraManager = AgoraManager({
+    appId: props.appId || appId,
+    channelName: props.channelName || channelName,
+    token: props.token || token
+  });
+  const [initialized, setInitialized] = useState(false);
+
+
+  useEffect(() => 
+  {
+    setupVideoSDKEngine(); // Initialize Agora SDK engine
+  });
+
+  // Initialize Agora SDK engine for video
+  const setupVideoSDKEngine = async () => {
+    if(!initialized)
     {
-      this.setState({
-        appId: this.props.appId,
-        channelName: this.props.channelName,
-        token: this.props.token
-      });
+      await agoraManager.setupVideoSDKEngine();
+      setInitialized(true);
     }
-    else if(appId && channelName && token)
-    {
-      this.setState({
-        appId: appId,
-        channelName: channelName,
-        token: token
-      });
-    }
-    else{
-      console.log('You did not specify appId, channelName, and token');
-    }
+    };
 
-    // Initialize the AgoraManager
-    await this.setupVideoSDKEngine();
-  }
-
-  // Handler for joining the video call
-  handleJoinCall = async () => {
-    await this.joinCall();
+  const handleJoinCall = async () => {
+    await agoraManager.joinCall();
   };
 
-  // Handler for leaving the video call
-  handleLeaveCall = async () => {
-    await this.leaveCall();
+  const handleLeaveCall = async () => {
+    await agoraManager.leaveCall();
   };
-
-  render() {
-    const { joined, showVideo, localVideoTrack, remoteVideoTrack } = this.state;
-
-    return (
-      // Render the VideoCallUI component with the necessary props
+  return (
+    <div>
       <VideoCallUI
-        title={this.props.title}
-        joined={joined}
-        showVideo={showVideo}
-        localVideoTrack={localVideoTrack}
-        remoteVideoTrack={remoteVideoTrack}
-        handleJoinCall={this.handleJoinCall}
-        handleLeaveCall={this.handleLeaveCall}
+        title={props.title}
+        joined={agoraManager.joined}
+        showVideo={agoraManager.showVideo}
+        localVideoTrack={agoraManager.localVideoTrack}
+        remoteVideoTrack={agoraManager.remoteVideoTrack}
+        handleJoinCall={handleJoinCall}
+        handleLeaveCall={handleLeaveCall}
       />
-    );
-  }
-}
+    </div>
+  );
+};
 
-export default VideoCall;
+export default GetStartedComponent;

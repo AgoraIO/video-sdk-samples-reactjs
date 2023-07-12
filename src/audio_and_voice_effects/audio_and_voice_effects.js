@@ -1,181 +1,160 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import AgoraRTC from "agora-rtc-react";
 import AgoraManager from "../AgoraManager/AgoraManager";
 import VideoCallUI from "../AgoraManager/AgoraUI";
-import AgoraRTC from "agora-rtc-react";
-// ...imports
 
-const appId = ''; // Agora App ID
-const channelName = ''; // Name of the channel to join
-const token = ''; // Token for authentication
+const AudioVoiceEffectsComponent = (props) => {
+  // State variables
+  const [isAudioMixing, setAudioMixing] = useState(false);
+  const [audioFileTrack, setAuidoFileTrack] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(null);
+  const [playbackDevices, setPlaybackDevices] = useState(null);
+  const [agoraEngine, setAgoraEngine] = useState(null);
+  const [initialized, setInitialized] = useState(false);
 
-class ProductWorkflow extends AgoraManager {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isAudioMixing: false, // Flag indicating whether audio mixing is active
-      audioFileTrack: null, // Selected audio file track
-      setShowDropdown: false, // Flag indicating whether to show the dropdown for selecting the audio playback device
-      playbackDevices: null // List of available audio playback devices
-    };
-  }
+  
 
-  async componentDidMount() 
-  {
-    if(this.props.appId && this.props.channelName && this.props.token)
-    {
-      this.setState({
-        appId: this.props.appId,
-        channelName: this.props.channelName,
-        token: this.props.token
-      });
+  // Initialize AgoraManager instance
+  const agoraManager = AgoraManager({
+    appId: props.appId || "",
+    channelName: props.channelName || "",
+    token: props.token || ""
+  });
+
+  // Run this effect only once on component mount
+  useEffect(() => {
+    setupVideoSDKEngine(); // Initialize Agora SDK engine
+  });
+
+  // Initialize Agora SDK engine for video
+  const setupVideoSDKEngine = async () => {
+    if (!initialized) {
+      const engine =  await agoraManager.setupVideoSDKEngine();
+      if (engine !== null) {
+        setAgoraEngine(engine);
+        let playbackDevices = await AgoraRTC.getPlaybackDevices(true);
+        setPlaybackDevices(playbackDevices)
+        engine.on("user-published", handleUserPublished);
+        engine.on("user-unpublished", handleUserUnpublished);
+        setInitialized(true);
     }
-    else if(appId && channelName && token)
-    {
-      this.setState({
-        appId: appId,
-        channelName: channelName,
-        token: token
-      });
-    }
-    else{
-      console.log('You did not specify appId, channelName, and token');
-    }
-
-    if (!this.state.agoraEngine) 
-    {
-      console.log("Init Engine");
-      await this.setupVideoSDKEngine(); // Set up the video SDK engine
-      this.setState({ playbackDevices: await AgoraRTC.getPlaybackDevices(true) });
-
-      this.state.agoraEngine.on("user-published", this.handleUserPublished);
-      this.state.agoraEngine.on("user-unpublished", this.handleUserUnpublished);
-    }
-  }
-
-  // Event handler for when a user with audio is published
-  handleUserPublished = async (user, mediaType) => {
+}
+};
+ // Event handler for when a user with audio is published
+ const handleUserPublished = async (user, mediaType) => {
     if (user.hasAudio) {
-      this.setState({
-        setShowDropdown: true
-      });
+      
+        setShowDropdown(true);
     }
   };
 
   // Event handler for when a user with audio is unpublished
-  handleUserUnpublished = (user, mediaType) => {
-    this.setState({
-      playbackDevices: null,
-      setShowDropdown: false
-    });
+const handleUserUnpublished = (user, mediaType) => {
+    setPlaybackDevices(null);
+    setShowDropdown(false);
   };
 
-  // Event handler for leaving the call
-  handleLeaveCall = async () => {
-    await this.leaveCall();
-    this.setState({
-      setShowDropdown: false,
-      isAudioMixing: false,
-      audioFileTrack: null // Clear the selected file
-    });
+  // Handler for joining a call
+  const handleJoinCall = async () => {
+    await agoraManager.joinCall();
+  };
+
+  // Handler for leaving a call
+  const handleLeaveCall = async () => {
+    await agoraManager.leaveCall();
+    setShowDropdown(false);
+    setAudioMixing(false);
+    setAuidoFileTrack(null);
     // Reset the file picker
     const fileInput = document.getElementById("filepicker");
-    if (fileInput) {
-      fileInput.value = null;
+    if (fileInput) 
+    {
+        fileInput.value = null;
     }
   };
 
-  // Event handler for joining the call
-  handleJoinCall = async () => {
-    await this.joinCall();
-  };
-
-  // Event handler for changing the audio playback device
-  handleAudioRouteChange = () => {
-    const { remoteAudioTrack } = this.state;
+   // Event handler for changing the audio playback device
+const handleAudioRouteChange = () => {
     const deviceID = document.getElementById("PlayoutDevice").value;
     console.log("The selected device id is : " + deviceID);
-    remoteAudioTrack.setPlaybackDevice(deviceID);
+    agoraManager.remoteAudioTrack.setPlaybackDevice(deviceID);
   };
 
   // Event handler for selecting an audio file
-  handleFileChange = async (event) => {
-    this.setState({
-      audioFileTrack: await AgoraRTC.createBufferSourceAudioTrack({ source: event.target.files[0] })
-    });
+const handleFileChange = async (event) => {
+    setAuidoFileTrack(await AgoraRTC.createBufferSourceAudioTrack({ source: event.target.files[0]}));
   };
-
-  // Event handler for starting/stopping audio mixing
-  handleAudioMixing = async () => {
-    this.setState((prevState) => ({
-      isAudioMixing: !prevState.isAudioMixing
-    }), this.processAudioMixing);
-  };
-
-  // Logic for starting/stopping audio mixing
-  processAudioMixing = async () => {
-    const { agoraEngine, isAudioMixing, audioFileTrack } = this.state;
-    // Check the audio mixing state.
-    if (isAudioMixing && audioFileTrack) {
-      // Start processing the audio data from the audio file.
-      await audioFileTrack.startProcessAudioBuffer();
-      // Call replaceTrack with stopOldTrack set to false to publish audioFileTrack and localAudioTrack together.
-      await agoraEngine.publish(audioFileTrack);
-      await audioFileTrack.play();
+// Event handler for starting/stopping audio mixing
+const handleAudioMixing = async () => {
+    if (!audioFileTrack) {
+      console.log("Please select an audio file to create a custom track");
+      return;
+    }
+  
+    if (!agoraManager.joined) {
+      console.log("Join a channel first to start audio mixing");
+      return;
+    }
+  
+    if (agoraManager.joined && !isAudioMixing) {
+      try {
+        // Start processing the audio data from the audio file.
+        await audioFileTrack.startProcessAudioBuffer();
+        await agoraEngine.publish(audioFileTrack);
+        await audioFileTrack.play();
+        setAudioMixing(true);
+      } catch (error) {
+        console.log("Error starting audio mixing:", error);
+      }
     } else {
-      // To stop audio mixing, stop processing the audio data and unpublish the audioFileTrack.
-      audioFileTrack.stopProcessAudioBuffer();
-      audioFileTrack.stop();
-      await agoraEngine.unpublish(audioFileTrack);
+      try {
+        // To stop audio mixing, stop processing the audio data and unpublish the audioFileTrack.
+        audioFileTrack.stopProcessAudioBuffer();
+        audioFileTrack.stop();
+        await agoraEngine.unpublish(audioFileTrack);
+        setAudioMixing(false);
+      } catch (error) {
+        console.log("Error stopping audio mixing:", error);
+      }
     }
   };
-
-  render() {
-    const {
-      joined,
-      setShowDropdown,
-      showVideo,
-      localVideoTrack,
-      remoteVideoTrack,
-      playbackDevices
-    } = this.state;
-
-    return (
-      <div>
-        <VideoCallUI
-          title={this.props.title}
-          joined={joined}
-          showVideo={showVideo}
-          localVideoTrack={localVideoTrack}
-          remoteVideoTrack={remoteVideoTrack}
-          handleJoinCall={this.handleJoinCall}
-          handleLeaveCall={this.handleLeaveCall}
-          additionalContent={
+  
+  return (
+    <div>
+      <VideoCallUI
+        title={props.title}
+        joined={agoraManager.joined}
+        showVideo={agoraManager.showVideo}
+        localVideoTrack={agoraManager.localVideoTrack}
+        remoteVideoTrack={agoraManager.remoteVideoTrack}
+        handleJoinCall={handleJoinCall}
+        handleLeaveCall={handleLeaveCall}
+        additionalContent={
             <div>
-              <label htmlFor="filepicker">Select an audio file:</label>
-              <input type="file" id="filepicker" accept="audio/*" onChange={this.handleFileChange} />
-              <br />
-              <button type="button" id="audioMixing" onClick={this.handleAudioMixing}>
-                {this.state.isAudioMixing ? 'Stop audio mixing' : 'Start audio mixing'}
-              </button>
-              <br />
-              {setShowDropdown && (
-                <div>
-                  <label htmlFor="PlayoutDevice">Playout Device:</label>
-                  <select id="PlayoutDevice" onChange={this.handleAudioRouteChange}>
-                    {playbackDevices.map((device, index) => (
-                      <option key={index} value={device.deviceId}>
-                        {device.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </div>
-          }
-        />
-      </div>
-    );
-  }
-}
+            <label htmlFor="filepicker">Select an audio file:</label>
+            <input type="file" id="filepicker" accept="audio/*" onChange={handleFileChange} />
+            <br />
+            <button type="button" id="audioMixing" onClick={handleAudioMixing}>
+              {isAudioMixing ? 'Stop audio mixing' : 'Start audio mixing'}
+            </button>
+            <br />
+            {showDropdown && (
+              <div>
+                <label htmlFor="PlayoutDevice">Playout Device:</label>
+                <select id="PlayoutDevice" onChange={handleAudioRouteChange}>
+                  {playbackDevices.map((device, index) => (
+                    <option key={index} value={device.deviceId}>
+                      {device.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+        }
+      />
+    </div>
+  );
+};
 
-export default ProductWorkflow;
+export default AudioVoiceEffectsComponent
