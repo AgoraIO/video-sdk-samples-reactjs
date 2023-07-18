@@ -1,53 +1,32 @@
-import React, {useEffect, useState} from "react";
-import AgoraManager from "../AgoraManager/AgoraManager";
+import {SetupVideoSdkEngine, Join} from "../AgoraManager/AgoraManager";
+import { AgoraRTCProvider} from "agora-rtc-react";
+import { useState } from "react";
 import VideoCallUI from "../AgoraManager/AgoraUI";
-
-// Initialize the Agora application ID, token, and channel name
-const appId = "";
-const channelName = "";
-const token = "";
-
 const GetStartedComponent = (props) => {
-  const agoraManager = AgoraManager({
-    appId: props.appId || appId,
-    channelName: props.channelName || channelName,
-    token: props.token || token
-  });
-  const [initialized, setInitialized] = useState(false);
+  const agoraEngine = SetupVideoSdkEngine();
+  const [joined, setJoined] = useState(false);
 
-
-  useEffect(() => 
-  {
-    setupVideoSDKEngine(); // Initialize Agora SDK engine
-  });
-
-  // Initialize Agora SDK engine for video
-  const setupVideoSDKEngine = async () => {
-    if(!initialized)
+  const handleJoinAndLeave = () =>
     {
-      await agoraManager.setupVideoSDKEngine();
-      setInitialized(true);
+      setJoined(prevJoined => !prevJoined);
     }
-    };
 
-  const handleJoinCall = async () => {
-    await agoraManager.joinCall();
+  const videoCallUIProps = {
+    title: props.title,
+    joined: joined,
+    showVideo: joined,
+    handleJoinAndLeave: handleJoinAndLeave
+    // Other props specific to VideoCallUI
   };
 
-  const handleLeaveCall = async () => {
-    await agoraManager.leaveCall();
-  };
   return (
     <div>
-      <VideoCallUI
-        title={props.title}
-        joined={agoraManager.joined}
-        showVideo={agoraManager.showVideo}
-        localVideoTrack={agoraManager.localVideoTrack}
-        remoteVideoTrack={agoraManager.remoteVideoTrack}
-        handleJoinCall={handleJoinCall}
-        handleLeaveCall={handleLeaveCall}
-      />
+      {!joined ? (<VideoCallUI {...videoCallUIProps}></VideoCallUI>) : 
+      (
+        <AgoraRTCProvider client={agoraEngine}>
+          <Join videoCallUIProps={videoCallUIProps} />
+        </AgoraRTCProvider>
+      )}
     </div>
   );
 };

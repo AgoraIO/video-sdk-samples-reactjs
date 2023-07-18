@@ -19,18 +19,16 @@ To run the sample projects in this folder, take the following steps:
 1. Clone the Git repository by executing the following command in a terminal window:
 
     ```bash
-    git clone https://github.com/AgoraIO/video-sdk-samples-reactjs
+    https://github.com/AgoraIO/video-sdk-samples-reactjs/tree/get-started-for-sdk-2.0
     ```
 
 1. To install the video SDK, open a command prompt in the root directory of the project and run the following command:
 
     ```bash
-    npm i agora-rtc-react
+    npm i agora-rtc-react@2.0.0-alpha.0
     ```
 
 1. In `src/App.js`, replace `appID`, `channelName`, and `token` with your app ID, channel name , and authentication token.
-<<<<<<< HEAD
-=======
 
 
 1. Open a command prompt in the project folder, and run the following command:
@@ -40,15 +38,4 @@ To run the sample projects in this folder, take the following steps:
     ```
     The project opens in your default browser.
 
-1. Select an item from the dropdown to test the sample codes.
->>>>>>> 578cc4ae51b74ea0a585d28e2634dfa6cc348f40
-
-
-1. Open a command prompt in the project folder, and run the following command:
-
-    ``` bash
-    npm start
-    ```
-    The project opens in your default browser.
-
-1. Select a sample code form the dropdown that you wish to execute.
+1. Select an sample code form the dropdown that you wish to execute.

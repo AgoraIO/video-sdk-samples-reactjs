@@ -1,31 +1,17 @@
 import React, { useEffect, useRef } from "react";
 
-class VideoCallUI extends Component {
-  constructor(props) {
-    super(props);
-    // Create references for the local and remote video elements
-    this.localVideoRef = React.createRef();
-    this.remoteVideoRef = React.createRef();
-  }
-  componentDidUpdate(prevProps) 
-  {
-    if(prevProps.localVideoTrack!== null || prevProps.remoteVideoTrack !== null)
-    {
-      this.playVideoTracks();
-    }
-  }
-  playVideoTracks() {
-    const { localVideoTrack, remoteVideoTrack } = this.props;
-    // Play the local video track on the local video element
-    if (localVideoTrack && this.localVideoRef.current) 
-    {
-      localVideoTrack.play(this.localVideoRef.current);
-    }
-    // Play the remote video track on the remote video element
-    if (remoteVideoTrack && this.remoteVideoRef.current) {
-      remoteVideoTrack.play(this.remoteVideoRef.current);
-    }
-  }
+const VideoCallUI = ({
+  title,
+  joined,
+  showVideo,
+  localVideoTrack,
+  remoteVideoTrack,
+  handleJoinAndLeave,
+  additionalContent,
+  agoraEngine
+}) => {
+  const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
 
   useEffect(() => {
     if (localVideoTrack && localVideoRef.current) {
@@ -54,7 +40,7 @@ class VideoCallUI extends Component {
       </header>
       <div>
         <div>
-          <button onClick={joined ? handleLeaveCall : handleJoinCall}>
+          <button onClick={handleJoinAndLeave}>
             {joined ? "Leave" : "Join"}
           </button>
         </div>
@@ -75,7 +61,7 @@ class VideoCallUI extends Component {
           </div>
         )}
       </div>
-    </div>
+      </div>
   );
 };
 

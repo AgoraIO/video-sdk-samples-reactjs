@@ -64,27 +64,6 @@ function App() {
         token = {token}
         title = 'Secure channel encryption'
         />;
-      case "customMedia":
-      return <CustomMedia 
-        appId = {appId}
-        channelName = {channelName}
-        token = {token}
-        title = 'Customize your video and audio source'
-        />;
-      case "geofencing":
-      return <Geofencing 
-        appId = {appId}
-        channelName = {channelName}
-        token = {token}
-        title = 'Geofencing'
-        />;
-      case "spatialAudio":
-      return <SpatialAudio 
-        appId = {appId}
-        channelName = {channelName}
-        token = {token}
-        title = '3D Spatial Audio'
-        />;
       case "mediaPlaying":
       return <PlayMedia
         appId = {appId}

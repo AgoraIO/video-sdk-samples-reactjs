@@ -1,84 +1,59 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  useJoin,
+  useLocalCameraTrack,
+  useLocalMicrophoneTrack,
+  usePublish,
+  useRTCClient,
+  useRemoteUsers,
+  useRemoteAudioTracks,
+} from "agora-rtc-react";
 import AgoraRTC from "agora-rtc-sdk-ng";
+import config from "./config.json";
+import VideoCallUI from "./AgoraUI";
 
-const AgoraManager = ({ appId, channelName, token }) => {
-  const [agoraEngine, setAgoraEngine] = useState(null);
-  const [microphoneAndCameraTracks, setMicrophoneAndCameraTracks] = useState(null);
-  const [localAudioTrack, setLocalAudioTrack] = useState(null);
-  const [localVideoTrack, setLocalVideoTrack] = useState(null);
+
+export function SetupVideoSdkEngine() 
+{
+  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+  return agoraEngine;
+}
+export function Join(props) {
+  const { localMicrophoneTrack } = useLocalMicrophoneTrack();
+  const { localCameraTrack } = useLocalCameraTrack();
+  const remoteUsers = useRemoteUsers();
+  const { audioTracks } = useRemoteAudioTracks(remoteUsers);
+  const videoCallUIProps = props.videoCallUIProps;
   const [remoteVideoTrack, setRemoteVideoTrack] = useState(null);
-  const [remoteUid, setRemoteUid] = useState(null);
-  const [joined, setJoined] = useState(false);
-  const [showVideo, setShowVideo] = useState(false);
 
-
-  const setupVideoSDKEngine = async () => 
-  {
-    const engine = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
-    const tracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-    if(engine && tracks)
-    {
-      setAgoraEngine(engine);
-      setMicrophoneAndCameraTracks(tracks);
-      engine.on("user-published", async (user, mediaType) => {
-      await engine.subscribe(user, mediaType);
-      if (mediaType === "video") {
-        setRemoteVideoTrack(user.videoTrack);
-        setRemoteUid(user.uid);
-      }
-    });
-
-    engine.on("user-unpublished", (user, mediaType) => {
-      if (mediaType === "video" && user.uid === remoteUid) {
-        setRemoteVideoTrack(null);
-        setRemoteUid(null);
-      }
-    });
-  }
-  return engine;
-  };
-
-  const joinCall = async () => {
-    try {
-      await agoraEngine.join(appId, channelName, token, 0);
-      setLocalAudioTrack(microphoneAndCameraTracks[0]);
-      setLocalVideoTrack(microphoneAndCameraTracks[1]);
-      await agoraEngine.publish([microphoneAndCameraTracks[0], microphoneAndCameraTracks[1]]);
-      setJoined(true);
-      setShowVideo(true);
-    } catch (error) {
-      console.error("Failed to join or publish:", error);
+  useEffect(() => {
+    if (remoteUsers.length > 0) {
+      const latestUser = remoteUsers[remoteUsers.length - 1];
+      const latestRemoteVideoTrack = latestUser.videoTrack;
+      setRemoteVideoTrack(latestRemoteVideoTrack);
+    } else {
+      setRemoteVideoTrack(null);
     }
-  };
+  }, [remoteUsers]);
 
-  const leaveCall = async () => {
-    try {
-      await agoraEngine.unpublish([localAudioTrack, localVideoTrack]);
-      await agoraEngine.leave();
-      setJoined(false);
-      setShowVideo(false);
-    } catch (error) {
-      console.error("Failed to unpublish or leave:", error);
-    }
-  };
+  usePublish([localMicrophoneTrack, localCameraTrack]);
+  useJoin({
+    appid: config.appId,
+    channel: config.channelName,
+    token: config.rtcToken === "" ? null : config.rtcToken,
+  });
 
-  return {
-    agoraEngine,
-    microphoneAndCameraTracks,
-    joined,
-    appId,
-    token,
-    channelName,
-    localVideoTrack,
-    remoteVideoTrack,
-    localAudioTrack,
-    remoteUid,
-    showVideo,
-    joinCall,
-    leaveCall,
-    setupVideoSDKEngine,
-    setMicrophoneAndCameraTracks
-  };
-};
+  audioTracks.map(track => track.play());
 
-export default AgoraManager;
+  return (
+    <div>
+      <VideoCallUI
+        {...videoCallUIProps}
+        localVideoTrack={localCameraTrack}
+        remoteVideoTrack={remoteVideoTrack}
+      />
+    </div>
+  );
+}
+
+  
