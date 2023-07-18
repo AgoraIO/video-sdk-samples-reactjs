@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+/*import React, { useState, useEffect } from "react";
 import AgoraManager from "../AgoraManager/AgoraManager";
 import VideoCallUI from "../AgoraManager/AgoraUI";
 
@@ -80,3 +80,4 @@ const MediaEncryptionComponent = (props) => {
 };
 
 export default MediaEncryptionComponent;
+*/

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+/*import React, {useEffect, useState} from "react";
 import AgoraManager from "../AgoraManager/AgoraManager";
 import VideoCallUI from "../AgoraManager/AgoraUI";
 
@@ -68,3 +68,4 @@ const setupVideoSDKEngine = async () => {
 };
 
 export default CloudProxyComponent;
+*/

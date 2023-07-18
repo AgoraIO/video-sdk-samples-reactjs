@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import AgoraRTC from "agora-rtc-react";
+/*import React, { useState, useEffect } from "react";
+import AgoraRTC from "agora-rtc-sdk-ng";
 import AgoraManager from "../AgoraManager/AgoraManager";
 import VideoCallUI from "../AgoraManager/AgoraUI";
 
@@ -169,3 +169,4 @@ const handleLocalAudioVolumeChange = (evt) =>
 };
 
 export default ProductWorkflowComponent
+*/

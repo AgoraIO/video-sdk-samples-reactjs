@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+/*import React, { useEffect, useState } from "react";
 import AgoraManager from "../AgoraManager/AgoraManager";
 import VideoCallUI from "../AgoraManager/AgoraUI";
-import AgoraRTC from "agora-rtc-react";
+import AgoraRTC from "agora-rtc-sdk-ng";
 
 // Initialize the Agora application ID, token, and channel name
 const appId = "";
@@ -75,3 +75,4 @@ const CustomAudioAndVideo = (props) => {
 };
 
 export default CustomAudioAndVideo;
+*/

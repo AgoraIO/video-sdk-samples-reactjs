@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+/*import React, { useEffect, useState } from "react";
 import AgoraManager from "../AgoraManager/AgoraManager";
 import VideoCallUI from "../AgoraManager/AgoraUI";
 import VirtualBackgroundExtension from "agora-extension-virtual-background";
@@ -141,3 +141,4 @@ const VirtualBackground = (props) => {
 };
 
 export default VirtualBackground;
+*/

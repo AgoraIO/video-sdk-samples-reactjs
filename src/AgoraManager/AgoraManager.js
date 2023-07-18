@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AgoraRTC from "agora-rtc-react";
+import AgoraRTC from "agora-rtc-sdk-ng";
 
 const AgoraManager = ({ appId, channelName, token }) => {
   const [agoraEngine, setAgoraEngine] = useState(null);

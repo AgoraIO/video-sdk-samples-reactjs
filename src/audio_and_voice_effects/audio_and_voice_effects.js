@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import AgoraRTC from "agora-rtc-react";
+/*import React, { useState, useEffect } from "react";
+import AgoraRTC from "agora-rtc-react-ng";
 import AgoraManager from "../AgoraManager/AgoraManager";
 import VideoCallUI from "../AgoraManager/AgoraUI";
 
@@ -158,3 +158,4 @@ const handleAudioMixing = async () => {
 };
 
 export default AudioVoiceEffectsComponent
+*/
