@@ -1,6 +1,6 @@
 # Agora Video SDK for ReactJS sample projects
 
-This repository holds the code examples used for the [Agora Video SDK for React ](https://docs.agora.io/en/video-calling/get-started/get-started-sdk?platform=web) documentation. Clone the repo, run and test the samples, use the code in your own project. Enjoy.
+This repository holds the code examples used for the [Agora Video SDK for React ](https://docs.agora.io/en/video-calling/get-started/get-started-sdk?platform=web) documentation. Clone the repo, run and test the samples, and use the code in your own project. Enjoy.
 
 ## Samples  
 
@@ -28,7 +28,7 @@ To run the sample projects in this folder, take the following steps:
     npm i agora-rtc-react@2.0.0-alpha.0
     ```
 
-1. In `src/App.js`, replace `appID`, `channelName`, and `token` with your app ID, channel name , and authentication token.
+1. In `src/App.js`, replace `appID`, `channelName`, and `token` with your app ID, channel name, and authentication token.
 
 
 1. Open a command prompt in the project folder, and run the following command:
@@ -38,4 +38,4 @@ To run the sample projects in this folder, take the following steps:
     ```
     The project opens in your default browser.
 
-1. Select an sample code form the dropdown that you wish to execute.
+1. Select a sample code from the dropdown that you wish to execute.
