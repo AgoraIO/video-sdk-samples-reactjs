@@ -19,7 +19,7 @@ To run the sample projects in this folder, take the following steps:
 1. Clone the Git repository by executing the following command in a terminal window:
 
     ```bash
-    https://github.com/AgoraIO/video-sdk-samples-reactjs/tree/get-started-for-sdk-2.0
+    git clone https://github.com/AgoraIO/video-sdk-samples-reactjs
     ```
 
 1. To install the video SDK, open a command prompt in the root directory of the project and run the following command:
