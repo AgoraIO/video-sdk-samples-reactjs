@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import GetStarted from "../get-started-sdk/get-started-sdk";
 import axios from "axios";
-import config from '../config.json';
+import config from '../config.ts';
 
 async function fetchRTCToken(channelName: string) {
   if (config.serverUrl !== "") {

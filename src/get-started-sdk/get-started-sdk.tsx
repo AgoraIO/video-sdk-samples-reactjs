@@ -1,37 +1,30 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import {
   AgoraRTCProvider,
+  LocalVideoTrack,
+  RemoteUser,
   useJoin,
   useLocalCameraTrack,
   useLocalMicrophoneTrack,
   usePublish,
   useRTCClient,
-  useRemoteAudioTracks,
   useRemoteUsers,
 } from "agora-rtc-react";
 import AgoraRTC from "agora-rtc-sdk-ng";
-import config from "../config.json"; // Assuming the config.json file is in the same directory as App.tsx
+import config from "../config.ts"; // Assuming the config.ts file is in the same directory as App.tsx
 
 function GetStarted() {
   const client = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
   const [joined, setJoined] = useState(false);
 
-  const handleJoin = () => {
-    setJoined(true);
-  };
-
-  const handleLeave = () => {
-    setJoined(false);
-  };
-
   return (
     <div>
-        <h1>Get started with Video Calling</h1>
+      <h1>Get started with Video Calling</h1>
       {!joined ? (
-        <button onClick={handleJoin}>Join</button>
+        <button onClick={() => setJoined(true)}>Join</button>
       ) : (
         <AgoraRTCProvider client={client}>
-          <button onClick={handleLeave}>Leave</button>
+          <button onClick={() => setJoined(false)}>Leave</button>
           <GetStartedComponent />
         </AgoraRTCProvider>
       )}
@@ -40,13 +33,9 @@ function GetStarted() {
 }
 
 function GetStartedComponent() {
-  const { isLoading: isLoadingMic, localMicrophoneTrack } = useLocalMicrophoneTrack();
   const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack();
+  const { isLoading: isLoadingMic, localMicrophoneTrack } = useLocalMicrophoneTrack();
   const remoteUsers = useRemoteUsers();
-  const { audioTracks } = useRemoteAudioTracks(remoteUsers);
-
-  const localVideoRef = useRef<HTMLVideoElement | null>(null);
-  const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
 
   usePublish([localMicrophoneTrack, localCameraTrack]);
 
@@ -56,30 +45,19 @@ function GetStartedComponent() {
     token: config.rtcToken,
   });
 
-  useEffect(() => {
-    if (localCameraTrack && localVideoRef.current) {
-      localCameraTrack.play(localVideoRef.current);
-    }
-  }, [localCameraTrack]);
-
-  useEffect(() => {
-    if (remoteUsers.length > 0 && remoteVideoRef.current) {
-      remoteUsers[0].videoTrack?.play(remoteVideoRef.current);
-    }
-  }, [remoteUsers]);
-
-  audioTracks.map((track) => track.play());
   const deviceLoading = isLoadingMic || isLoadingCam;
   if (deviceLoading) return <div>Loading devices...</div>;
 
   return (
     <div id="videos">
-      <div className="vid" style={{ height: "95%", width: "95%" }}>
-        <video ref={localVideoRef} autoPlay />
+      <div className="vid" style={{ height: 300, width: 600 }}>
+        <LocalVideoTrack track={localCameraTrack} play={true} />
       </div>
-      <div className="vid" style={{ height: "95%", width: "95%" }}>
-        <video ref={remoteVideoRef} autoPlay />
-      </div>
+      {remoteUsers.map((remoteUser) => (
+        <div className="vid" style={{ height: 300, width: 600 }}>
+          <RemoteUser user={remoteUser} playVideo={true} playAudio={true} />
+        </div>
+      ))}
     </div>
   );
 }
