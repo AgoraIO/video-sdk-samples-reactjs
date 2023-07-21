@@ -1,0 +1,12 @@
+{
+    "uid": "1",
+    "appId": "",
+    "channelName": "",
+    "rtcToken": null,
+    "serverUrl": "",
+    "tokenExpiryTime": "600",
+    "token": "",
+    "encryptionMode": 7,
+    "salt": "",
+    "cipherKey": ""
+}

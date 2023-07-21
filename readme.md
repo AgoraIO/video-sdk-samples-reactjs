@@ -6,10 +6,9 @@ This repository holds the code examples used for the [Agora Video SDK for React 
 
 The runnable code examples are:
 
-- [SDK quickstart](/src/sdk_quickstart/) - The minimum code you need to integrate high-quality, low-latency Video 
+- [SDK quickstart](./src//get-started-sdk/get-started-sdk.tsx) - The minimum code you need to integrate high-quality, low-latency Video 
   Calling features into your app using Video SDK.
-- [Call quality best practice](/src/call_quality/) - How to use Video SDK features to ensure optimal audio and video 
-  quality in your app. 
+- [Authentication Workflow](./src/AuthenticationWorflow/AuthenticationWorkflow.tsx) - Authenticate the users with an authentication token.
 
 
 ## Run this project
@@ -28,13 +27,13 @@ To run the sample projects in this folder, take the following steps:
     npm i agora-rtc-react@2.0.0-alpha.0
     ```
 
-1. In `src/App.js`, replace `appID`, `channelName`, and `token` with your app ID, channel name , and authentication token.
+1. In `src/config.json`, replace `appId`, `channelName`, and `rtcToken` with your app ID, channel name , and authentication token.
 
 
 1. Open a command prompt in the project folder, and run the following command:
 
     ``` bash
-    npm start
+    yarn dev
     ```
     The project opens in your default browser.
 
