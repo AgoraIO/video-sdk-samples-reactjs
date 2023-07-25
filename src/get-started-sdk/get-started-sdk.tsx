@@ -13,18 +13,26 @@ import {
 import AgoraRTC from "agora-rtc-sdk-ng";
 import config from "../config.ts"; // Assuming the config.ts file is in the same directory as App.tsx
 
-function GetStarted() {
+interface GetStartedProps {
+  title?: string;
+  children?: React.ReactNode;
+}
+const GetStarted: React.FC<GetStartedProps> = ({ title, children }) => {
   const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
   const [joined, setJoined] = useState(false);
 
   return (
     <div>
-      <h1>Get started with Video Calling</h1>
+      <h1>{title}</h1>
       {!joined ? (
+        <AgoraRTCProvider client={agoraEngine}>
         <button onClick={() => setJoined(true)}>Join</button>
+        {children}
+        </AgoraRTCProvider>
       ) : (
         <AgoraRTCProvider client={agoraEngine}>
           <button onClick={() => setJoined(false)}>Leave</button>
+          {children}
           <GetStartedComponent />
         </AgoraRTCProvider>
       )}
@@ -32,17 +40,17 @@ function GetStarted() {
   );
 }
 
-function GetStartedComponent() {
+function GetStartedComponent() 
+{
   const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack();
   const { isLoading: isLoadingMic, localMicrophoneTrack } = useLocalMicrophoneTrack();
   const remoteUsers = useRemoteUsers();
-
   usePublish([localMicrophoneTrack, localCameraTrack]);
 
   useJoin({
     appid: config.appId,
     channel: config.channelName,
-    token: config.rtcToken,
+    token: config.rtcToken === "" ? null : config.rtcToken,
   });
 
   const deviceLoading = isLoadingMic || isLoadingCam;

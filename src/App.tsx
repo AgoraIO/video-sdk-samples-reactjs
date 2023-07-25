@@ -1,6 +1,7 @@
 import { useState, ChangeEvent } from "react";
 import GetStarted from './get-started-sdk/get-started-sdk';
 import AuthenticationWorkflow from "./AuthenticationWorflow/AuthenticationWorkflow";
+import EnsureCallQuality from "./ensure-call-quality/ensure-call-quality";
 
 
 type SelectedOption = "getStarted" | "callQuality" | "audioEffects" | "productWorkflow" | "cloudProxy"
@@ -21,6 +22,9 @@ function App() {
       case "authenticationWorkflow":
           return <AuthenticationWorkflow
           />;
+      case "callQuality":
+          return <EnsureCallQuality
+      />;
       default:
         return null;
     }
@@ -33,6 +37,7 @@ function App() {
         <option value="">Select</option>
         <option value="getStarted">Get Started</option>
         <option value="authenticationWorkflow">Authentication Workflow</option>
+        <option value="callQuality">Ensure Call Quality</option>
       </select>
       {renderSelectedOption()}
     </div>
