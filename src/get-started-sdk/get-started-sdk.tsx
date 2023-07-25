@@ -11,9 +11,10 @@ import {
   useRemoteUsers,
 } from "agora-rtc-react";
 import AgoraRTC from "agora-rtc-sdk-ng";
-import config from "../config.ts"; // Assuming the config.ts file is in the same directory as App.tsx
+import configImport, { configType } from "../config.ts"; // Assuming the config.ts file is in the same directory as App.tsx
 
-function GetStarted() {
+export function GetStarted(props: { config: configType }) {
+  const config = props.config;
   const client = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
   const [joined, setJoined] = useState(false);
 
@@ -25,14 +26,15 @@ function GetStarted() {
       ) : (
         <AgoraRTCProvider client={client}>
           <button onClick={() => setJoined(false)}>Leave</button>
-          <GetStartedComponent />
+          <GetStartedComponent config={config} />
         </AgoraRTCProvider>
       )}
     </div>
   );
 }
 
-function GetStartedComponent() {
+function GetStartedComponent(props: { config: configType }) {
+  const config = props.config;
   const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack();
   const { isLoading: isLoadingMic, localMicrophoneTrack } = useLocalMicrophoneTrack();
   const remoteUsers = useRemoteUsers();
@@ -54,7 +56,7 @@ function GetStartedComponent() {
         <LocalVideoTrack track={localCameraTrack} play={true} />
       </div>
       {remoteUsers.map((remoteUser) => (
-        <div className="vid" style={{ height: 300, width: 600 }}>
+        <div className="vid" style={{ height: 300, width: 600 }} key={remoteUser.uid}>
           <RemoteUser user={remoteUser} playVideo={true} playAudio={true} />
         </div>
       ))}
@@ -62,4 +64,4 @@ function GetStartedComponent() {
   );
 }
 
-export default GetStarted;
+export default () => GetStarted({ config: configImport });

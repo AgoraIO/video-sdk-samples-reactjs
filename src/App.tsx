@@ -1,10 +1,18 @@
 import { useState, ChangeEvent } from "react";
-import GetStarted from './get-started-sdk/get-started-sdk';
+import GetStarted from "./get-started-sdk/get-started-sdk";
 import AuthenticationWorkflow from "./AuthenticationWorflow/AuthenticationWorkflow";
 
-
-type SelectedOption = "getStarted" | "callQuality" | "audioEffects" | "productWorkflow" | "cloudProxy"
-  | "mediaEncryption" | "mediaPlaying" | "virtualBackground" | "authenticationWorkflow" | "";
+type SelectedOption =
+  | "getStarted"
+  | "callQuality"
+  | "audioEffects"
+  | "productWorkflow"
+  | "cloudProxy"
+  | "mediaEncryption"
+  | "mediaPlaying"
+  | "virtualBackground"
+  | "authenticationWorkflow"
+  | "";
 
 function App() {
   const [selectedOption, setSelectedOption] = useState<SelectedOption>("");
@@ -16,11 +24,9 @@ function App() {
   const renderSelectedOption = () => {
     switch (selectedOption) {
       case "getStarted":
-        return <GetStarted
-        />;
+        return <GetStarted />;
       case "authenticationWorkflow":
-          return <AuthenticationWorkflow
-          />;
+        return <AuthenticationWorkflow />;
       default:
         return null;
     }

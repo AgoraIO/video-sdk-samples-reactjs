@@ -1,21 +1,16 @@
-import { useEffect } from "react";
-import GetStarted from "../get-started-sdk/get-started-sdk";
-import axios from "axios";
-import config from '../config.ts';
+import { useEffect, useState } from "react";
+import { GetStarted } from "../get-started-sdk/get-started-sdk";
+import config from "../config.ts";
 
 async function fetchRTCToken(channelName: string) {
   if (config.serverUrl !== "") {
     try {
-      const response = await axios.get(
-        `${config.proxyUrl}${config.serverUrl}/rtc/${channelName}/1/uid/${config.uid}/?expiry=${config.tokenExpiryTime}`,
-        {
-          headers: {
-            "X-Requested-With": "XMLHttpRequest",
-          },
-        }
+      const response = await fetch(
+        `${config.proxyUrl}/${config.serverUrl}/rtc/${channelName}/1/uid/${config.uid}/?expiry=${config.tokenExpiryTime}`
       );
-      console.log("RTC token fetched from server: ", response.data.rtcToken);
-      return response.data.rtcToken;
+      const data = await response.json();
+      console.log("RTC token fetched from server: ", data.rtcToken);
+      return data.rtcToken;
     } catch (error) {
       console.error(error);
       throw error;
@@ -26,17 +21,24 @@ async function fetchRTCToken(channelName: string) {
 }
 
 function AuthenticationWorkflow() {
+  const [token, setToken] = useState("");
+
   useEffect(() => {
-    fetchRTCToken("hussain").then((token) => {
-      config.rtcToken = token;
-    }).catch((error) => {
-      console.error(error);
-    });
-  }, []);
+    fetchRTCToken(config.channelName)
+      .then((fetchedToken) => {
+        setToken(fetchedToken);
+      })
+      .catch((error) => {
+        setToken("");
+        console.error(error);
+      });
+  }, [config.channelName]);
+
+  if (!token) return <p>Fetching token</p>;
 
   return (
     <div>
-      <GetStarted />
+      <GetStarted config={{ ...config, rtcToken: token }} />
     </div>
   );
 }
