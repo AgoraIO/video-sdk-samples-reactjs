@@ -14,7 +14,7 @@ import AgoraRTC from "agora-rtc-sdk-ng";
 import config from "../config.ts"; // Assuming the config.ts file is in the same directory as App.tsx
 
 function GetStarted() {
-  const client = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
   const [joined, setJoined] = useState(false);
 
   return (
@@ -23,7 +23,7 @@ function GetStarted() {
       {!joined ? (
         <button onClick={() => setJoined(true)}>Join</button>
       ) : (
-        <AgoraRTCProvider client={client}>
+        <AgoraRTCProvider client={agoraEngine}>
           <button onClick={() => setJoined(false)}>Leave</button>
           <GetStartedComponent />
         </AgoraRTCProvider>
