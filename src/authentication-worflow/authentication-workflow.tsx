@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import GetStarted from "../get-started-sdk/get-started-sdk";
+import GetStarted from "../get-started-sdk/get-started-sdk.tsx";
 import axios from "axios";
 import config from '../config.ts';
 

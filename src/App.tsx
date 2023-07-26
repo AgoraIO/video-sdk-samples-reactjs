@@ -1,6 +1,6 @@
 import { useState, ChangeEvent } from "react";
 import GetStarted from './get-started-sdk/get-started-sdk';
-import AuthenticationWorkflow from "./AuthenticationWorflow/AuthenticationWorkflow";
+import AuthenticationWorkflow from "./authentication-worflow/authentication-workflow";
 
 
 type SelectedOption = "getStarted" | "callQuality" | "audioEffects" | "productWorkflow" | "cloudProxy"
