@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { GetStarted } from "../get-started-sdk/get-started-sdk";
 import config from "../config.ts";
+import { useClientEvent, useRTCClient } from "agora-rtc-react";
 
 async function fetchRTCToken(channelName: string) {
   if (config.serverUrl !== "") {
     try {
       const response = await fetch(
-        `${config.proxyUrl}/${config.serverUrl}/rtc/${channelName}/1/uid/${config.uid}/?expiry=${config.tokenExpiryTime}`
+        `${config.proxyUrl}${config.serverUrl}/rtc/${channelName}/publisher/uid/${config.uid}/?expiry=${config.tokenExpiryTime}`
       );
       const data = await response.json();
       console.log("RTC token fetched from server: ", data.rtcToken);
@@ -20,8 +21,27 @@ async function fetchRTCToken(channelName: string) {
   }
 }
 
+const useTokenWillExpire = () => {
+  const agoraEngine = useRTCClient();
+  useClientEvent(agoraEngine, "token-privilege-will-expire", () => {
+    if (config.serverUrl !== "") {
+      fetchRTCToken(config.channelName)
+        .then((token: string) => {
+          console.log("RTC token fetched from server: ", token);
+          return agoraEngine.renewToken(token);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    } else {
+      console.log("Please make sure you specified the token server URL in the configuration file");
+    }
+  });
+};
+
 function AuthenticationWorkflow() {
   const [token, setToken] = useState("");
+  useTokenWillExpire();
 
   useEffect(() => {
     fetchRTCToken(config.channelName)
