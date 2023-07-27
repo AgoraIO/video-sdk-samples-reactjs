@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GetStarted } from "../get-started-sdk/get-started-sdk";
+import { GetStarted } from "../get-started-sdk/get-started-sdk.tsx";
 import config from "../config.ts";
 import { useClientEvent, useRTCClient } from "agora-rtc-react";
 

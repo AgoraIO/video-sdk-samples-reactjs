@@ -1,6 +1,6 @@
 import { useState, ChangeEvent } from "react";
 import {GetStarted} from "./get-started-sdk/get-started-sdk";
-import AuthenticationWorkflow from "./AuthenticationWorflow/AuthenticationWorkflow";
+import AuthenticationWorkflow from "./authentication-workflow/authentication-workflow";
 import { AgoraRTCProvider, useRTCClient } from "agora-rtc-react";
 import AgoraRTC from "agora-rtc-sdk-ng";
 import config from "./config";
