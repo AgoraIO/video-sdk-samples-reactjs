@@ -1,8 +1,9 @@
 import { useState, ChangeEvent } from "react";
-import GetStarted from "./get-started-sdk/get-started-sdk";
+import {GetStarted} from "./get-started-sdk/get-started-sdk";
 import AuthenticationWorkflow from "./AuthenticationWorflow/AuthenticationWorkflow";
 import { AgoraRTCProvider, useRTCClient } from "agora-rtc-react";
 import AgoraRTC from "agora-rtc-sdk-ng";
+import config from "./config";
 
 type SelectedOption =
   | "getStarted"
@@ -27,7 +28,7 @@ function App() {
   const renderSelectedOption = () => {
     switch (selectedOption) {
       case "getStarted":
-        return <GetStarted />;
+        return <GetStarted config={config} title="Get Started with Video Calling"/>; // Step 2: Pass the title prop to GetStarted
       case "authenticationWorkflow":
         return <AuthenticationWorkflow />;
       default:

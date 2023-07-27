@@ -9,14 +9,17 @@ import {
   useRemoteUsers,
 } from "agora-rtc-react";
 import configImport, { configType } from "../config.ts"; // Assuming the config.ts file is in the same directory as App.tsx
+interface GetStartedProps {
+  title: string;
+  config: configType;
+}
 
-export function GetStarted(props: { config: configType }) {
+export function GetStarted(props: GetStartedProps) {
   const config = props.config;
   const [joined, setJoined] = useState(false);
-
   return (
     <div>
-      <h1>Get started with Video Calling</h1>
+      <h1>{props.title}</h1>
       {!joined ? (
         <button onClick={() => setJoined(true)}>Join</button>
       ) : (
@@ -61,4 +64,4 @@ function GetStartedComponent(props: { config: configType }) {
   );
 }
 
-export default () => GetStarted({ config: configImport });
+export default () => GetStarted({ config: configImport, title: "" });
