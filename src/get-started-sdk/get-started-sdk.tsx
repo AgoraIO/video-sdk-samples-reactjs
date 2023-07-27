@@ -1,38 +1,39 @@
 import { useState } from "react";
 import {
-  AgoraRTCProvider,
   LocalVideoTrack,
   RemoteUser,
   useJoin,
   useLocalCameraTrack,
   useLocalMicrophoneTrack,
   usePublish,
-  useRTCClient,
   useRemoteUsers,
 } from "agora-rtc-react";
-import AgoraRTC from "agora-rtc-sdk-ng";
-import config from "../config.ts"; // Assuming the config.ts file is in the same directory as App.tsx
+import configImport, { configType } from "../config.ts"; // Assuming the config.ts file is in the same directory as App.tsx
+interface GetStartedProps {
+  title: string;
+  config: configType;
+}
 
-function GetStarted() {
-  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+export function GetStarted(props: GetStartedProps) {
+  const config = props.config;
   const [joined, setJoined] = useState(false);
-
   return (
     <div>
-      <h1>Get started with Video Calling</h1>
+      <h1>{props.title}</h1>
       {!joined ? (
         <button onClick={() => setJoined(true)}>Join</button>
       ) : (
-        <AgoraRTCProvider client={agoraEngine}>
+        <>
           <button onClick={() => setJoined(false)}>Leave</button>
-          <GetStartedComponent />
-        </AgoraRTCProvider>
+          <GetStartedComponent config={config} />
+        </>
       )}
     </div>
   );
 }
 
-function GetStartedComponent() {
+function GetStartedComponent(props: { config: configType }) {
+  const config = props.config;
   const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack();
   const { isLoading: isLoadingMic, localMicrophoneTrack } = useLocalMicrophoneTrack();
   const remoteUsers = useRemoteUsers();
@@ -43,6 +44,7 @@ function GetStartedComponent() {
     appid: config.appId,
     channel: config.channelName,
     token: config.rtcToken,
+    uid: config.uid,
   });
 
   const deviceLoading = isLoadingMic || isLoadingCam;
@@ -54,7 +56,7 @@ function GetStartedComponent() {
         <LocalVideoTrack track={localCameraTrack} play={true} />
       </div>
       {remoteUsers.map((remoteUser) => (
-        <div className="vid" style={{ height: 300, width: 600 }}>
+        <div className="vid" style={{ height: 300, width: 600 }} key={remoteUser.uid}>
           <RemoteUser user={remoteUser} playVideo={true} playAudio={true} />
         </div>
       ))}
@@ -62,4 +64,4 @@ function GetStartedComponent() {
   );
 }
 
-export default GetStarted;
+export default () => GetStarted({ config: configImport, title: "" });

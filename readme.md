@@ -36,4 +36,10 @@ To run the sample projects in this folder, take the following steps:
     ```
     The project opens in your default browser.
 
+1. Open another terminal in the project folder and run the following command to start a proxy server in order to fetch a token:
+
+    ```bash
+    node ./utils/proxy.js
+    ```
+
 1. Select a sample code from the dropdown that you wish to execute.
