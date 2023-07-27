@@ -10,6 +10,7 @@ import {
   useAutoPlayAudioTrack,
   useJoin,
   useVolumeLevel,
+  LocalVideoTrack,
 } from "agora-rtc-react";
 import { ICameraVideoTrack, ILocalAudioTrack } from "agora-rtc-sdk-ng";
 import GetStarted from "../get-started-sdk/get-started-sdk";
@@ -58,7 +59,9 @@ const CallQualityFeatures: React.FC = () => {
   };
 
   const updateNetworkStatus = () => {
-    if (networkQuality.uplink === 1) {
+    if (networkQuality.uplink === 0) {
+      return <label>Network Quality: Unknown</label>;
+    } else if (networkQuality.uplink === 1) {
       return <label>Network Quality: Excellent</label>;
     } else if (networkQuality.uplink === 2) {
       return <label>Network Quality: Good</label>;
@@ -98,7 +101,7 @@ const CallQualityFeatures: React.FC = () => {
       {updateNetworkStatus()}
       <p>Connection State: {connectionState}</p>
       <br />
-      <button onClick={showStatistics}>Show Statistics</button>
+      <button onClick={showStatistics}>Log statistics to console</button>
       <button onClick={() => setRemoteVideoQuality()}>
         {isHighRemoteVideoQuality ? "Low Video Quality" : "High Video Quality"}
       </button>
@@ -116,41 +119,24 @@ const CallQualityFeatures: React.FC = () => {
 };
 
 const VideoDeviceTest: React.FC<{ localCameraTrack: ICameraVideoTrack }> = (props) => {
-  useJoin(
-    {
-      appid: config.appId,
-      channel: config.channelName,
-      token: config.rtcToken,
-    },
-    true
-  );
-
-  const divRef = useRef<HTMLDivElement>(null);
-  useAutoPlayVideoTrack(props.localCameraTrack, true, divRef.current);
+  useJoin({ appid: config.appId, channel: config.channelName, token: config.rtcToken }, true);
 
   return (
     <div>
-      <div ref={divRef} style={{ width: "600px", height: "600px" }} />
+      <LocalVideoTrack track={props.localCameraTrack} play={true} style={{ width: "600px", height: "600px" }} />
     </div>
   );
 };
 
 const AudioDeviceTest: React.FC<{ localMicrophoneTrack: ILocalAudioTrack }> = (props) => {
-  useJoin(
-    {
-      appid: config.appId,
-      channel: config.channelName,
-      token: config.rtcToken,
-    },
-    true
-  );
+  useJoin({ appid: config.appId, channel: config.channelName, token: config.rtcToken }, true);
 
   useAutoPlayAudioTrack(props.localMicrophoneTrack, true);
-  const volume = useVolumeLevel();
+  const volume = useVolumeLevel(props.localMicrophoneTrack);
 
   return (
     <div className="h-screen p-3">
-      <p>local Audio Volume: {volume}</p>
+    <p>local Audio Volume: {Math.floor(volume * 100)}</p>
     </div>
   );
 };
