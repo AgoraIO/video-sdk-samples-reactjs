@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GetStarted } from "../get-started-sdk/get-started-sdk.tsx";
+import { AgoraManager } from "../agora-manager/agoraManager.tsx";
 import config from "../config.ts";
 import { useClientEvent, useRTCClient } from "agora-rtc-react";
 
@@ -21,7 +21,7 @@ async function fetchRTCToken(channelName: string) {
   }
 }
 
-const useTokenWillExpire = () => {
+ const useTokenWillExpire = () => {
   const agoraEngine = useRTCClient();
   useClientEvent(agoraEngine, "token-privilege-will-expire", () => {
     if (config.serverUrl !== "") {
@@ -39,16 +39,16 @@ const useTokenWillExpire = () => {
   });
 };
 
-function AuthenticationWorkflow() {
-  const [token, setToken] = useState("");
+function AuthenticationWorkflowManager() {
   const [channelName, setChannelName] = useState<string>("");
+  const [joined, setJoined] = useState(false);
   useTokenWillExpire();
 
   useEffect(() => {
     if (config.serverUrl !== "" && channelName !== "") {
       fetchRTCToken(channelName)
         .then((token: string) => {
-          setToken(token);
+          config.rtcToken = token;
           config.channelName = channelName;
           console.log("RTC token fetched from server: ", token);
         })
@@ -63,17 +63,26 @@ function AuthenticationWorkflow() {
 
   return (
     <div>
-      <h1>Secure Communication with an Authentication Token</h1>
-      <input
+      {!joined ? 
+      (
+        <>
+        <input
         type="text"
         value={channelName}
         onChange={(e) => setChannelName(e.target.value)}
-        placeholder="Channel name"
-      />
-      <GetStarted config={{ ...config, rtcToken: token}} title="" />
+        placeholder="Channel name"/>
+        <button onClick={() => setJoined(true)}>Join</button>
+        </>
+      ) : 
+      (
+        <>
+        <button onClick={() => setJoined(false)}>Leave</button>
+        <AgoraManager config={config} />
+        </>
+      )}
     </div>
   );
 }
 
-export default AuthenticationWorkflow;
+export default AuthenticationWorkflowManager;
 
