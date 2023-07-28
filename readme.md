@@ -21,15 +21,18 @@ To run the sample projects in this folder, take the following steps:
     git clone https://github.com/AgoraIO/video-sdk-samples-reactjs
     ```
 
-1. To install the video SDK, open a command prompt in the root directory of the project and run the following command:
+1. Install the dependencies:
 
-    ```bash
-    npm i agora-rtc-react@2.0.0-alpha.0
+    In Terminal, navigate to `video-sdk-samples-reactjs`, and execute the following command.
+
+    ``` bash
+    npm install
     ```
 
-1. In `src/config.json`, replace `appId`, `channelName`, and `rtcToken` with your app ID, channel name , and authentication token.
 
-1. Open a command prompt in the project folder, and run the following command:
+1. In `src/config.json`, update the values of `appID`, `channelName`, and `token` with the values for your temporary token.
+
+1. In Terminal, run the following command:
 
     ``` bash
     yarn dev
@@ -42,4 +45,4 @@ To run the sample projects in this folder, take the following steps:
     node ./utils/proxy.js
     ```
 
-1. Select a sample code from the dropdown that you wish to execute.
+1. In the dropdown, select a sample you want to run and test the code.

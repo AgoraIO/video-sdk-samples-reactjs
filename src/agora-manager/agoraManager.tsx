@@ -9,30 +9,11 @@ import {
   useRemoteUsers,
 } from "agora-rtc-react";
 import configImport, { configType } from "../config.ts"; // Assuming the config.ts file is in the same directory as App.tsx
-interface GetStartedProps {
-  title: string;
+interface AgoraManagerProps {
   config: configType;
 }
 
-export function GetStarted(props: GetStartedProps) {
-  const config = props.config;
-  const [joined, setJoined] = useState(false);
-  return (
-    <div>
-      <h1>{props.title}</h1>
-      {!joined ? (
-        <button onClick={() => setJoined(true)}>Join</button>
-      ) : (
-        <>
-          <button onClick={() => setJoined(false)}>Leave</button>
-          <GetStartedComponent config={config} />
-        </>
-      )}
-    </div>
-  );
-}
-
-function GetStartedComponent(props: { config: configType }) {
+export function AgoraManager(props: AgoraManagerProps) {
   const config = props.config;
   const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack();
   const { isLoading: isLoadingMic, localMicrophoneTrack } = useLocalMicrophoneTrack();
@@ -64,4 +45,4 @@ function GetStartedComponent(props: { config: configType }) {
   );
 }
 
-export default () => GetStarted({ config: configImport, title: "" });
+export default () => AgoraManager({ config: configImport});

@@ -1,8 +1,6 @@
 import { useState, ChangeEvent } from "react";
-import {GetStarted} from "./get-started-sdk/get-started-sdk";
-import AuthenticationWorkflow from "./authentication-workflow/authentication-workflow";
-import { AgoraRTCProvider, useRTCClient } from "agora-rtc-react";
-import AgoraRTC from "agora-rtc-sdk-ng";
+import {GetStarted} from "./get-started-sdk/getStartedSdk";
+import AuthenticationWorkflow from "./authentication-workflow/authenticationWorkflow";
 import config from "./config";
 
 type SelectedOption =
@@ -19,7 +17,6 @@ type SelectedOption =
 
 function App() {
   const [selectedOption, setSelectedOption] = useState<SelectedOption>("");
-  const client = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
 
   const handleOptionChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value as SelectedOption);
@@ -38,7 +35,6 @@ function App() {
 
   return (
     <div>
-      <AgoraRTCProvider client={client}>
         <h3>Select a sample code:</h3>
         <select value={selectedOption} onChange={handleOptionChange}>
           <option value="">Select</option>
@@ -46,7 +42,6 @@ function App() {
           <option value="authenticationWorkflow">Authentication Workflow</option>
         </select>
         {renderSelectedOption()}
-      </AgoraRTCProvider>
     </div>
   );
 }
