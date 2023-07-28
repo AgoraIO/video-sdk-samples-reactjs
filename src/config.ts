@@ -6,7 +6,7 @@ const config: configType = {
   channelName: "test",
   rtcToken: null,
   serverUrl: "",
-  proxyUrl: "",
+  proxyUrl: "http://localhost:8080/",
   tokenExpiryTime: 600,
   token: "",
   encryptionMode: "aes-128-xts",
@@ -14,7 +14,7 @@ const config: configType = {
   cipherKey: "",
 };
 
-type configType = {
+export type configType = {
   uid: UID;
   appId: string;
   channelName: string;
