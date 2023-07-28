@@ -39,8 +39,7 @@ const useTokenWillExpire = () => {
   });
 };
 
-function AuthenticationWorkflow() {
-  const [token, setToken] = useState("");
+function AuthenticationWorkflow(props: {title?: string}) {
   const [channelName, setChannelName] = useState<string>("");
   useTokenWillExpire();
 
@@ -48,7 +47,7 @@ function AuthenticationWorkflow() {
     if (config.serverUrl !== "" && channelName !== "") {
       fetchRTCToken(channelName)
         .then((token: string) => {
-          setToken(token);
+          config.rtcToken = token;
           config.channelName = channelName;
           console.log("RTC token fetched from server: ", token);
         })
@@ -63,14 +62,14 @@ function AuthenticationWorkflow() {
 
   return (
     <div>
-      <h1>Secure Communication with an Authentication Token</h1>
+      <h1>{props.title? props.title: "Secure Communication with an Authentication Token"}</h1>
       <input
         type="text"
         value={channelName}
         onChange={(e) => setChannelName(e.target.value)}
         placeholder="Channel name"
       />
-      <GetStarted config={{ ...config, rtcToken: token}} title="" />
+      <GetStarted config={{ ...config}} title="" />
     </div>
   );
 }
