@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AgoraManager } from "../agoraManager/agoraManager.tsx";
+import { AgoraManager } from "../agora-manager/agoraManager.tsx";
 import config from "../config.ts";
 import { useClientEvent, useRTCClient } from "agora-rtc-react";
 

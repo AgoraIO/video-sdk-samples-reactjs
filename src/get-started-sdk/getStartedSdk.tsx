@@ -5,7 +5,7 @@ import {
 } from "agora-rtc-react";
 import AgoraRTC from "agora-rtc-sdk-ng";
 import configImport, { configType } from "../config.ts"; // Assuming the config.ts file is in the same directory as App.tsx
-import {AgoraManager} from "../agoraManager/agoraManager.tsx";
+import {AgoraManager} from "../agora-manager/agoraManager.tsx";
 import config from "../config.ts";
 interface GetStartedProps {
   title: string;
