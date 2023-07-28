@@ -3,7 +3,6 @@ import {
   useRTCClient
 } from "agora-rtc-react";
 import AgoraRTC from "agora-rtc-sdk-ng";
-import config from "../config.ts";
 import AuthenticationWorkflowManager from "./authenticationWorkflowManager.tsx";
 export function AuthenticationWorkflow() 
 {

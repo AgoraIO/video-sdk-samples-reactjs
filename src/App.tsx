@@ -1,7 +1,11 @@
 import { useState, ChangeEvent } from "react";
 import {GetStarted} from "./get-started-sdk/getStartedSdk";
 import AuthenticationWorkflow from "./authentication-workflow/authenticationWorkflow";
-import config from "./config";
+import Geofencing from "./geofencing/geofencing";
+import CloudProxy  from "./cloud-proxy/cloudProxy";
+import MediaEncryption from "./media-encryption/mediaEncryption";
+
+import config from "./agora-manager/config";
 
 type SelectedOption =
   | "getStarted"
@@ -13,6 +17,7 @@ type SelectedOption =
   | "mediaPlaying"
   | "virtualBackground"
   | "authenticationWorkflow"
+  | "geofencing"
   | "";
 
 function App() {
@@ -28,6 +33,12 @@ function App() {
         return <GetStarted config={config} title="Get Started with Video Calling"/>; // Step 2: Pass the title prop to GetStarted
       case "authenticationWorkflow":
         return <AuthenticationWorkflow />;
+      case "geofencing":
+        return <Geofencing />;
+      case "mediaEncryption":
+        return <MediaEncryption />;
+      case "cloudProxy":
+        return <CloudProxy />;
       default:
         return null;
     }
@@ -40,6 +51,10 @@ function App() {
           <option value="">Select</option>
           <option value="getStarted">Get Started</option>
           <option value="authenticationWorkflow">Authentication Workflow</option>
+          <option value="cloudProxy">Cloud Proxy</option>
+          <option value="geofencing">Geofencing</option>
+          <option value="mediaEncryption">Media Stream Encryption</option>
+
         </select>
         {renderSelectedOption()}
     </div>

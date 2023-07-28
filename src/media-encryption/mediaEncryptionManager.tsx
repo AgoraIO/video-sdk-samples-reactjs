@@ -1,8 +1,7 @@
 // Import statements
-import AuthenticationWorkflow from '../authentication-workflow/authentication-workflow.tsx';
 import { useRTCClient } from 'agora-rtc-react';
-import config from '../config.ts';
-
+import config from '../agora-manager/config.ts';
+import AuthenticationWorkflowManager from '../authentication-workflow/authenticationWorkflowManager.tsx';
 function base64ToUint8Array({ base64Str }) {
   const raw = window.atob(base64Str);
   const result = new Uint8Array(new ArrayBuffer(raw.length));
@@ -32,13 +31,13 @@ const useMediaEncryption = () => {
   agoraEngine.setEncryptionConfig(config.encryptionMode, config.cipherKey, salt);
 };
 
-function MediaEncryption() {
+function MediaEncryptionManager() {
   useMediaEncryption();
   return (
     <div>
-      <AuthenticationWorkflow title="Secure channel encryption" />
+      <AuthenticationWorkflowManager/>
     </div>
   );
 }
 
-export default MediaEncryption;
+export default MediaEncryptionManager;
