@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Children, useEffect, useState } from "react";
 import { AgoraManager } from "../agora-manager/agoraManager.tsx";
 import config from "../config.ts";
 import { useClientEvent, useRTCClient } from "agora-rtc-react";
@@ -39,7 +39,7 @@ async function fetchRTCToken(channelName: string) {
   });
 };
 
-function AuthenticationWorkflowManager() {
+function AuthenticationWorkflowManager(props:{children?: React.ReactNode}) {
   const [channelName, setChannelName] = useState<string>("");
   const [joined, setJoined] = useState(false);
   useTokenWillExpire();
@@ -72,11 +72,13 @@ function AuthenticationWorkflowManager() {
         onChange={(e) => setChannelName(e.target.value)}
         placeholder="Channel name"/>
         <button onClick={() => setJoined(true)}>Join</button>
+        {props.children}
         </>
       ) : 
       (
         <>
         <button onClick={() => setJoined(false)}>Leave</button>
+        {props.children}
         <AgoraManager config={config} />
         </>
       )}

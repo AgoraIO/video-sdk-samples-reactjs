@@ -1,3 +1,4 @@
+// EnsureCallQualityManager.tsx
 import React, { useState, useRef, useEffect } from "react";
 import {
   useRTCClient,
@@ -5,7 +6,6 @@ import {
   useNetworkQuality,
   useLocalMicrophoneTrack,
   useLocalCameraTrack,
-  useAutoPlayVideoTrack,
   useConnectionState,
   useAutoPlayAudioTrack,
   useJoin,
@@ -13,21 +13,20 @@ import {
   LocalVideoTrack,
 } from "agora-rtc-react";
 import { ICameraVideoTrack, ILocalAudioTrack } from "agora-rtc-sdk-ng";
-import GetStarted from "../get-started-sdk/get-started-sdk";
 import config from "../config";
+import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
 
-function EnsureCallQuality() {
+function EnsureCallQualityManager(): JSX.Element {
   return (
     <div>
-      <h1>Call Quality Best Practice</h1>
-      <GetStarted>
-        <CallQualityFeatures />
-      </GetStarted>
+      <AuthenticationWorkflowManager>
+        <CallQualityFeaturesComponent />
+      </AuthenticationWorkflowManager>
     </div>
   );
 }
 
-const CallQualityFeatures: React.FC = () => {
+const CallQualityFeaturesComponent: React.FC = () => {
   const agoraEngine = useRTCClient();
   const remoteUsers = useRemoteUsers();
   const [isHighRemoteVideoQuality, setVideoQualityState] = useState(false);
@@ -42,12 +41,15 @@ const CallQualityFeatures: React.FC = () => {
 
   useEffect(() => {
     if (!enabledFeatures.current) {
-      CallQualityEssentials();
+      callQualityEssentials()
+        .then(() => console.log("Call quality features enabled"))
+        .catch((error) => console.error(error));
       enabledFeatures.current = true;
     }
   }, []);
+  
 
-  const CallQualityEssentials = async () => {
+  const callQualityEssentials = async () => {
     await agoraEngine.enableDualStream();
     await localCameraTrack?.setEncoderConfiguration({
       width: 640,
@@ -81,19 +83,29 @@ const CallQualityFeatures: React.FC = () => {
     console.log("Channel statistics:", rtcStats);
   };
 
-  const setRemoteVideoQuality = async () => {
+  const setRemoteVideoQuality = () => {
     if (!remoteUser) {
       console.log("No remote user in the channel");
       return;
     }
 
     if (!isHighRemoteVideoQuality) {
-      await agoraEngine.setRemoteVideoStreamType(remoteUser.uid, 0);
-      setVideoQualityState(true);
+      agoraEngine.setRemoteVideoStreamType(remoteUser.uid, 0)
+      .then(() => setVideoQualityState(true))
+      .catch((error) => console.error(error));
     } else {
-      await agoraEngine.setRemoteVideoStreamType(remoteUser.uid, 1);
-      setVideoQualityState(false);
+      agoraEngine.setRemoteVideoStreamType(remoteUser.uid, 1)
+      .then(() => setVideoQualityState(false))
+      .catch((error) => console.error(error));
     }
+  };
+
+  const handleStartDeviceTest = () => {
+    setDeviceTestState(true);
+  };
+
+  const handleStopDeviceTest = () => {
+    setDeviceTestState(false);
   };
 
   return (
@@ -105,40 +117,46 @@ const CallQualityFeatures: React.FC = () => {
       <button onClick={() => setRemoteVideoQuality()}>
         {isHighRemoteVideoQuality ? "Low Video Quality" : "High Video Quality"}
       </button>
-      {!isDeviceTestRunning ? (
-        <button onClick={() => setDeviceTestState(true)}>Start Device Test</button>
-      ) : (
+      {connectionState === "DISCONNECTED" && !isDeviceTestRunning && (
+        <button onClick={handleStartDeviceTest}>Start Device Test</button>
+      )}
+      {connectionState !== "DISCONNECTED" && isDeviceTestRunning && (
+        <button onClick={handleStopDeviceTest}>Stop Device Test</button>
+      )}
+      {isDeviceTestRunning && (
         <div>
-          <button onClick={() => setDeviceTestState(false)}>Stop Device Test</button>
-          <VideoDeviceTest localCameraTrack={localCameraTrack} />
-          <AudioDeviceTest localMicrophoneTrack={localMicrophoneTrack} />
+          <VideoDeviceTestComponent localCameraTrack={localCameraTrack} />
+          <AudioDeviceTestComponent localMicrophoneTrack={localMicrophoneTrack} />
         </div>
       )}
     </div>
   );
 };
 
-const VideoDeviceTest: React.FC<{ localCameraTrack: ICameraVideoTrack }> = (props) => {
+const VideoDeviceTestComponent: React.FC<{ localCameraTrack: ICameraVideoTrack }> = ({
+  localCameraTrack,
+}) => {
   useJoin({ appid: config.appId, channel: config.channelName, token: config.rtcToken }, true);
 
   return (
     <div>
-      <LocalVideoTrack track={props.localCameraTrack} play={true} style={{ width: "600px", height: "600px" }} />
+      <LocalVideoTrack track={localCameraTrack} play={true} style={{ width: "600px", height: "600px" }} />
     </div>
   );
 };
 
-const AudioDeviceTest: React.FC<{ localMicrophoneTrack: ILocalAudioTrack }> = (props) => {
-  useJoin({ appid: config.appId, channel: config.channelName, token: config.rtcToken }, true);
+const AudioDeviceTestComponent: React.FC<{ localMicrophoneTrack: ILocalAudioTrack }> = ({
+  localMicrophoneTrack,
+}) => {
 
-  useAutoPlayAudioTrack(props.localMicrophoneTrack, true);
-  const volume = useVolumeLevel(props.localMicrophoneTrack);
+  useAutoPlayAudioTrack(localMicrophoneTrack, true);
+  const volume = useVolumeLevel(localMicrophoneTrack);
 
   return (
     <div className="h-screen p-3">
-    <p>local Audio Volume: {Math.floor(volume * 100)}</p>
+      <p>local Audio Volume: {Math.floor(volume * 100)}</p>
     </div>
   );
 };
 
-export default EnsureCallQuality;
+export default EnsureCallQualityManager;
