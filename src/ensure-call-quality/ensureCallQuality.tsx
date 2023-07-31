@@ -3,19 +3,19 @@ import {
   useRTCClient
 } from "agora-rtc-react";
 import AgoraRTC from "agora-rtc-sdk-ng";
-import AuthenticationWorkflowManager from "./authenticationWorkflowManager.tsx";
-export function AuthenticationWorkflow() 
+import EnsureCallQualityManager from "./ensureCallQualityManager";
+export function CallQuality() 
 {
   const client = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
 
   return (
     <div>
-      <h1>Secure Communication with an Authentication Token</h1>
+      <h1>Call Quality Best Practice</h1>
       <AgoraRTCProvider client={client}>
-        <AuthenticationWorkflowManager />
+        <EnsureCallQualityManager />
       </AgoraRTCProvider>
     </div>
   );
 }
 
-export default () => AuthenticationWorkflow();
+export default () => CallQuality();
