@@ -1,10 +1,19 @@
 import { useState, ChangeEvent } from "react";
-import GetStarted from './get-started-sdk/get-started-sdk';
-import AuthenticationWorkflow from "./authentication-worflow/authentication-workflow";
+import {GetStarted} from "./get-started-sdk/getStartedSdk";
+import AuthenticationWorkflow from "./authentication-workflow/authenticationWorkflow";
+import config from "./config";
 
-
-type SelectedOption = "getStarted" | "callQuality" | "audioEffects" | "productWorkflow" | "cloudProxy"
-  | "mediaEncryption" | "mediaPlaying" | "virtualBackground" | "authenticationWorkflow" | "";
+type SelectedOption =
+  | "getStarted"
+  | "callQuality"
+  | "audioEffects"
+  | "productWorkflow"
+  | "cloudProxy"
+  | "mediaEncryption"
+  | "mediaPlaying"
+  | "virtualBackground"
+  | "authenticationWorkflow"
+  | "";
 
 function App() {
   const [selectedOption, setSelectedOption] = useState<SelectedOption>("");
@@ -16,14 +25,9 @@ function App() {
   const renderSelectedOption = () => {
     switch (selectedOption) {
       case "getStarted":
-        return <GetStarted
-        />;
+        return <GetStarted config={config} title="Get Started with Video Calling"/>; // Step 2: Pass the title prop to GetStarted
       case "authenticationWorkflow":
-          return <AuthenticationWorkflow
-          />;
-      case "callQuality":
-          return <EnsureCallQuality
-      />;
+        return <AuthenticationWorkflow />;
       default:
         return null;
     }
@@ -31,14 +35,13 @@ function App() {
 
   return (
     <div>
-      <h3>Select a sample code:</h3>
-      <select value={selectedOption} onChange={handleOptionChange}>
-        <option value="">Select</option>
-        <option value="getStarted">Get Started</option>
-        <option value="authenticationWorkflow">Authentication Workflow</option>
-        <option value="callQuality">Ensure Call Quality</option>
-      </select>
-      {renderSelectedOption()}
+        <h3>Select a sample code:</h3>
+        <select value={selectedOption} onChange={handleOptionChange}>
+          <option value="">Select</option>
+          <option value="getStarted">Get Started</option>
+          <option value="authenticationWorkflow">Authentication Workflow</option>
+        </select>
+        {renderSelectedOption()}
     </div>
   );
 }
