@@ -47,10 +47,13 @@ const CallQualityFeaturesComponent: React.FC = () => {
       enabledFeatures.current = true;
     }
   }, []);
-  
 
   const callQualityEssentials = async () => {
-    await agoraEngine.enableDualStream();
+    try {
+      await agoraEngine.enableDualStream();
+    } catch (error) {
+      console.log(error);
+    }
     await localCameraTrack?.setEncoderConfiguration({
       width: 640,
       height: { ideal: 480, min: 400, max: 500 },
@@ -90,13 +93,15 @@ const CallQualityFeaturesComponent: React.FC = () => {
     }
 
     if (!isHighRemoteVideoQuality) {
-      agoraEngine.setRemoteVideoStreamType(remoteUser.uid, 0)
-      .then(() => setVideoQualityState(true))
-      .catch((error) => console.error(error));
+      agoraEngine
+        .setRemoteVideoStreamType(remoteUser.uid, 0)
+        .then(() => setVideoQualityState(true))
+        .catch((error) => console.error(error));
     } else {
-      agoraEngine.setRemoteVideoStreamType(remoteUser.uid, 1)
-      .then(() => setVideoQualityState(false))
-      .catch((error) => console.error(error));
+      agoraEngine
+        .setRemoteVideoStreamType(remoteUser.uid, 1)
+        .then(() => setVideoQualityState(false))
+        .catch((error) => console.error(error));
     }
   };
 
@@ -113,10 +118,14 @@ const CallQualityFeaturesComponent: React.FC = () => {
       {updateNetworkStatus()}
       <p>Connection State: {connectionState}</p>
       <br />
-      <button onClick={showStatistics}>Log statistics to console</button>
-      <button onClick={() => setRemoteVideoQuality()}>
-        {isHighRemoteVideoQuality ? "Low Video Quality" : "High Video Quality"}
-      </button>
+      {connectionState !== "DISCONNECTED" && !isDeviceTestRunning && (
+        <>
+          <button onClick={showStatistics}>Log statistics to console</button>
+          <button onClick={() => setRemoteVideoQuality()}>
+            {isHighRemoteVideoQuality ? "Low Video Quality" : "High Video Quality"}
+          </button>
+        </>
+      )}
       {connectionState === "DISCONNECTED" && !isDeviceTestRunning && (
         <button onClick={handleStartDeviceTest}>Start Device Test</button>
       )}
@@ -126,16 +135,14 @@ const CallQualityFeaturesComponent: React.FC = () => {
       {isDeviceTestRunning && (
         <div>
           <VideoDeviceTestComponent localCameraTrack={localCameraTrack} />
-          <AudioDeviceTestComponent localMicrophoneTrack={localMicrophoneTrack} />
+          {localMicrophoneTrack && <AudioDeviceTestComponent localMicrophoneTrack={localMicrophoneTrack} />}
         </div>
       )}
     </div>
   );
 };
 
-const VideoDeviceTestComponent: React.FC<{ localCameraTrack: ICameraVideoTrack }> = ({
-  localCameraTrack,
-}) => {
+const VideoDeviceTestComponent: React.FC<{ localCameraTrack: ICameraVideoTrack | null }> = ({ localCameraTrack }) => {
   useJoin({ appid: config.appId, channel: config.channelName, token: config.rtcToken }, true);
 
   return (
@@ -145,10 +152,7 @@ const VideoDeviceTestComponent: React.FC<{ localCameraTrack: ICameraVideoTrack }
   );
 };
 
-const AudioDeviceTestComponent: React.FC<{ localMicrophoneTrack: ILocalAudioTrack }> = ({
-  localMicrophoneTrack,
-}) => {
-
+const AudioDeviceTestComponent: React.FC<{ localMicrophoneTrack: ILocalAudioTrack }> = ({ localMicrophoneTrack }) => {
   useAutoPlayAudioTrack(localMicrophoneTrack, true);
   const volume = useVolumeLevel(localMicrophoneTrack);
 
