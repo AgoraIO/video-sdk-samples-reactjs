@@ -6,6 +6,7 @@ import CloudProxy  from "./cloud-proxy/cloudProxy";
 import MediaEncryption from "./media-encryption/mediaEncryption";
 
 import config from "./agora-manager/config";
+import CallQuality from "./ensure-call-quality/ensureCallQuality";
 
 type SelectedOption =
   | "getStarted"
@@ -39,6 +40,8 @@ function App() {
         return <MediaEncryption />;
       case "cloudProxy":
         return <CloudProxy />;
+      case "callQuality":
+        return <CallQuality />;
       default:
         return null;
     }
@@ -54,7 +57,7 @@ function App() {
           <option value="cloudProxy">Cloud Proxy</option>
           <option value="geofencing">Geofencing</option>
           <option value="mediaEncryption">Media Stream Encryption</option>
-
+          <option value="callQuality">Ensure Call Quality</option>
         </select>
         {renderSelectedOption()}
     </div>
