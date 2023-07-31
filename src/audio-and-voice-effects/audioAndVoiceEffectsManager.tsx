@@ -1,6 +1,6 @@
-// EnsureCallQualityManager.tsx
-import React, { useState } from "react";
-import { usePublish, useRTCClient, useConnectionState } from "agora-rtc-react";
+import "../App.css";
+import React, { useEffect, useRef, useState } from "react";
+import { usePublish, useRTCClient, useConnectionState, useTrackEvent } from "agora-rtc-react";
 import AgoraRTC, { IBufferSourceAudioTrack } from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
 
@@ -14,20 +14,33 @@ function AudioAndVoiceEffectsManager(): JSX.Element {
   );
 }
 
+const AudioMixing: React.FC<{ track: IBufferSourceAudioTrack }> = ({ track }) => {
+  usePublish([track]);
+
+  useEffect(() => {
+    track.startProcessAudioBuffer();
+    track.play(); // to play the track for the local user
+    return () => {
+      track.stopProcessAudioBuffer();
+      track.stop();
+    };
+  }, [track]);
+
+  return <div> Audio mixing is in progress </div>;
+};
+
 const AudioAndVoiceEffectsComponent: React.FC = () => {
   const [isAudioMixing, setAudioMixing] = useState(false);
   const [audioFileTrack, setAudioFileTrack] = useState<IBufferSourceAudioTrack | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [playbackDevices, setPlaybackDevices] = useState<MediaDeviceInfo[]>([]);
-  const agoraEngine = useRTCClient();
+  const playoutDeviceRef = useRef<HTMLSelectElement>(null);
   const connectionState = useConnectionState();
-  usePublish([audioFileTrack]);
-
 
   // Event handler for changing the audio playback device
   const handleAudioRouteChange = () => {
     if (audioFileTrack) {
-      const deviceID = document.getElementById("PlayoutDevice")?.value;
+      const deviceID = playoutDeviceRef.current?.value;
       if (deviceID) {
         console.log("The selected device id is: " + deviceID);
         try {
@@ -51,44 +64,8 @@ const AudioAndVoiceEffectsComponent: React.FC = () => {
     }
   };
 
-  // Event handler for starting/stopping audio mixing
-  const handleAudioMixing = () => {
-    if (!audioFileTrack) {
-      console.log("Please select an audio file to create a custom track");
-      return;
-    }
-    if(connectionState === "DISCONNECTED")
-    {
-        console.log("You cannot mix audio before joining a channel")
-        return;
-    }
-    if (!isAudioMixing) {
-      try {
-        // Start processing the audio data from the audio file.
-        audioFileTrack.startProcessAudioBuffer();
-        agoraEngine.publish(audioFileTrack);
-        audioFileTrack.play();
-        setAudioMixing(true);
-      } catch (error) {
-        console.error("Error starting audio mixing:", error);
-      }
-    } else {
-      try {
-        // To stop audio mixing, stop processing the audio data and unpublish the audioFileTrack.
-        audioFileTrack.stopProcessAudioBuffer();
-        audioFileTrack.stop();
-        agoraEngine.unpublish(audioFileTrack);
-        setAudioMixing(false);
-      }
-      catch (error) 
-      {
-        console.error("Error stopping audio mixing:", error);
-      }
-    }
-  };
-
   // Fetch the available audio playback devices when the component mounts
-  React.useEffect(() => {
+  useEffect(() => {
     navigator.mediaDevices?.enumerateDevices?.().then((devices) => {
       try {
         const playbackDevices = devices.filter((device) => device.kind === "audiooutput");
@@ -102,17 +79,24 @@ const AudioAndVoiceEffectsComponent: React.FC = () => {
 
   return (
     <div>
-      <label htmlFor="filepicker">Select an audio file:</label>
-      <input type="file" id="filepicker" accept="audio/*" onChange={handleFileChange} />
       <br />
-      <button type="button" id="audioMixing" onClick={handleAudioMixing}>
+      <label htmlFor="filepicker">Select an audio file: </label>
+      <input
+        type="file"
+        id="filepicker"
+        accept="audio/*"
+        onChange={handleFileChange}
+        disabled={connectionState === "DISCONNECTED"}
+      />
+      <br /><br />
+      <button type="button" id="audioMixing" onClick={() => setAudioMixing((p) => !p)} disabled={!audioFileTrack}>
         {isAudioMixing ? "Stop audio mixing" : "Start audio mixing"}
       </button>
-      <br />
+      <br /><br />
       {showDropdown && (
         <div>
-          <label htmlFor="PlayoutDevice">Playout Device:</label>
-          <select id="PlayoutDevice" onChange={handleAudioRouteChange}>
+          <label htmlFor="PlayoutDevice">Output Device: </label>
+          <select ref={playoutDeviceRef} onChange={handleAudioRouteChange}>
             {playbackDevices.map((device, index) => (
               <option key={index} value={device.deviceId}>
                 {device.label}
@@ -121,6 +105,8 @@ const AudioAndVoiceEffectsComponent: React.FC = () => {
           </select>
         </div>
       )}
+      {isAudioMixing && audioFileTrack && <AudioMixing track={audioFileTrack} />}
+      <br />
     </div>
   );
 };
