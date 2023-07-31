@@ -1,11 +1,8 @@
-import {
-  AgoraRTCProvider,
-  useRTCClient
-} from "agora-rtc-react";
+import { AgoraRTCProvider, useRTCClient } from "agora-rtc-react";
 import AgoraRTC from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "./authenticationWorkflowManager.tsx";
-export function AuthenticationWorkflow() 
-{
+
+export function AuthenticationWorkflow() {
   const client = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
 
   return (

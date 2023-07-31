@@ -1,9 +1,10 @@
 // Import statements
-import { useRTCClient } from 'agora-rtc-react';
-import config from '../agora-manager/config.ts';
-import AuthenticationWorkflowManager from '../authentication-workflow/authenticationWorkflowManager.tsx';
-function base64ToUint8Array({ base64Str }) {
-  const raw = window.atob(base64Str);
+import { useRTCClient } from "agora-rtc-react";
+import config from "../agora-manager/config.ts";
+import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager.tsx";
+
+function base64ToUint8Array(props: { base64Str: string }) {
+  const raw = window.atob(props.base64Str);
   const result = new Uint8Array(new ArrayBuffer(raw.length));
   for (let i = 0; i < raw.length; i += 1) {
     result[i] = raw.charCodeAt(i);
@@ -11,8 +12,9 @@ function base64ToUint8Array({ base64Str }) {
   return result;
 }
 
-function hex2ascii({ hexx }) {
-  let str = '';
+function hex2ascii(props: { hexx: string }) {
+  let str = "";
+  const hexx = props.hexx;
   for (let i = 0; i < hexx.length; i += 2) {
     str += String.fromCharCode(parseInt(hexx.substr(i, 2), 16));
   }
@@ -26,7 +28,7 @@ const useMediaEncryption = () => {
   // Convert the cipherKey string to hex2ascii.
   config.cipherKey = hex2ascii({ hexx: config.cipherKey });
   // Set an encryption mode.
-  config.encryptionMode = 'aes-256-gcm2';
+  config.encryptionMode = "aes-256-gcm2";
   // Start channel encryption
   agoraEngine.setEncryptionConfig(config.encryptionMode, config.cipherKey, salt);
 };
@@ -35,7 +37,7 @@ function MediaEncryptionManager() {
   useMediaEncryption();
   return (
     <div>
-      <AuthenticationWorkflowManager/>
+      <AuthenticationWorkflowManager />
     </div>
   );
 }

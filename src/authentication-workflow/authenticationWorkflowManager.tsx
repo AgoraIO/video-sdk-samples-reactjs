@@ -21,7 +21,7 @@ async function fetchRTCToken(channelName: string) {
   }
 }
 
- const useTokenWillExpire = () => {
+const useTokenWillExpire = () => {
   const agoraEngine = useRTCClient();
   useClientEvent(agoraEngine, "token-privilege-will-expire", () => {
     if (config.serverUrl !== "") {
@@ -60,24 +60,22 @@ function AuthenticationWorkflowManager() {
     }
   }, [channelName]);
 
-
   return (
     <div>
-      {!joined ? 
-      (
+      {!joined ? (
         <>
-        <input
-        type="text"
-        value={channelName}
-        onChange={(e) => setChannelName(e.target.value)}
-        placeholder="Channel name"/>
-        <button onClick={() => setJoined(true)}>Join</button>
+          <input
+            type="text"
+            value={channelName}
+            onChange={(e) => setChannelName(e.target.value)}
+            placeholder="Channel name"
+          />
+          <button onClick={() => setJoined(true)}>Join</button>
         </>
-      ) : 
-      (
+      ) : (
         <>
-        <button onClick={() => setJoined(false)}>Leave</button>
-        <AgoraManager config={config} />
+          <button onClick={() => setJoined(false)}>Leave</button>
+          <AgoraManager config={config} />
         </>
       )}
     </div>
@@ -85,4 +83,3 @@ function AuthenticationWorkflowManager() {
 }
 
 export default AuthenticationWorkflowManager;
-
