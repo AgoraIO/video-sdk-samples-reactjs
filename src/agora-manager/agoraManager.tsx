@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   LocalVideoTrack,
   RemoteUser,
@@ -18,7 +17,6 @@ export function AgoraManager(props: AgoraManagerProps) {
   const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack();
   const { isLoading: isLoadingMic, localMicrophoneTrack } = useLocalMicrophoneTrack();
   const remoteUsers = useRemoteUsers();
-
   usePublish([localMicrophoneTrack, localCameraTrack]);
 
   useJoin({
