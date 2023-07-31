@@ -1,6 +1,7 @@
 import { useState, ChangeEvent } from "react";
 import {GetStarted} from "./get-started-sdk/getStartedSdk";
 import AuthenticationWorkflow from "./authentication-workflow/authenticationWorkflow";
+import audioAndVoiceEffects, { AudioAndVoiceEffects } from "./audio-and-voice-effects/audioAndVoiceEffects";
 import config from "./config";
 
 type SelectedOption =
@@ -13,6 +14,7 @@ type SelectedOption =
   | "mediaPlaying"
   | "virtualBackground"
   | "authenticationWorkflow"
+  | "audioEffects"
   | "";
 
 function App() {
@@ -28,6 +30,8 @@ function App() {
         return <GetStarted config={config} title="Get Started with Video Calling"/>; // Step 2: Pass the title prop to GetStarted
       case "authenticationWorkflow":
         return <AuthenticationWorkflow />;
+      case "audioEffects":
+        return <AudioAndVoiceEffects/>
       default:
         return null;
     }
@@ -40,6 +44,7 @@ function App() {
           <option value="">Select</option>
           <option value="getStarted">Get Started</option>
           <option value="authenticationWorkflow">Authentication Workflow</option>
+          <option value="audioEffects">Audio and Voice Effects</option>
         </select>
         {renderSelectedOption()}
     </div>

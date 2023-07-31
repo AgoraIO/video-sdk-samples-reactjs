@@ -1,6 +1,6 @@
 // EnsureCallQualityManager.tsx
 import React, { useState } from "react";
-import { useRTCClient } from "agora-rtc-react";
+import { usePublish, useRTCClient, useConnectionState } from "agora-rtc-react";
 import AgoraRTC, { IBufferSourceAudioTrack } from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
 
@@ -20,6 +20,9 @@ const AudioAndVoiceEffectsComponent: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [playbackDevices, setPlaybackDevices] = useState<MediaDeviceInfo[]>([]);
   const agoraEngine = useRTCClient();
+  const connectionState = useConnectionState();
+  usePublish([audioFileTrack]);
+
 
   // Event handler for changing the audio playback device
   const handleAudioRouteChange = () => {
@@ -27,7 +30,11 @@ const AudioAndVoiceEffectsComponent: React.FC = () => {
       const deviceID = document.getElementById("PlayoutDevice")?.value;
       if (deviceID) {
         console.log("The selected device id is: " + deviceID);
-        audioFileTrack.setPlaybackDevice(deviceID);
+        try {
+          audioFileTrack.setPlaybackDevice(deviceID);
+        } catch (error) {
+          console.error("Error setting playback device:", error);
+        }
       }
     }
   };
@@ -36,49 +43,61 @@ const AudioAndVoiceEffectsComponent: React.FC = () => {
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const selectedFile = event.target.files[0];
-      setAudioFileTrack(await AgoraRTC.createBufferSourceAudioTrack({ source: selectedFile }));
+      try {
+        setAudioFileTrack(await AgoraRTC.createBufferSourceAudioTrack({ source: selectedFile }));
+      } catch (error) {
+        console.error("Error creating buffer source audio track:", error);
+      }
     }
   };
 
   // Event handler for starting/stopping audio mixing
-  const handleAudioMixing = async () => {
+  const handleAudioMixing = () => {
     if (!audioFileTrack) {
       console.log("Please select an audio file to create a custom track");
       return;
     }
-
+    if(connectionState === "DISCONNECTED")
+    {
+        console.log("You cannot mix audio before joining a channel")
+        return;
+    }
     if (!isAudioMixing) {
       try {
         // Start processing the audio data from the audio file.
         audioFileTrack.startProcessAudioBuffer();
-        await agoraEngine.publish(audioFileTrack);
+        agoraEngine.publish(audioFileTrack);
         audioFileTrack.play();
         setAudioMixing(true);
       } catch (error) {
-        console.log("Error starting audio mixing:", error);
+        console.error("Error starting audio mixing:", error);
       }
     } else {
       try {
         // To stop audio mixing, stop processing the audio data and unpublish the audioFileTrack.
         audioFileTrack.stopProcessAudioBuffer();
         audioFileTrack.stop();
-        await agoraEngine.unpublish(audioFileTrack);
+        agoraEngine.unpublish(audioFileTrack);
         setAudioMixing(false);
-      } catch (error) {
-        console.log("Error stopping audio mixing:", error);
+      }
+      catch (error) 
+      {
+        console.error("Error stopping audio mixing:", error);
       }
     }
   };
 
   // Fetch the available audio playback devices when the component mounts
   React.useEffect(() => {
-    if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
-      navigator.mediaDevices.enumerateDevices().then((devices) => {
+    navigator.mediaDevices?.enumerateDevices?.().then((devices) => {
+      try {
         const playbackDevices = devices.filter((device) => device.kind === "audiooutput");
         setPlaybackDevices(playbackDevices);
         setShowDropdown(playbackDevices.length > 0);
-      });
-    }
+      } catch (error) {
+        console.error("Error enumerating playback devices:", error);
+      }
+    });
   }, []);
 
   return (
