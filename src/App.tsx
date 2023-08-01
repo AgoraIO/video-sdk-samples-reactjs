@@ -1,11 +1,11 @@
 import { useState, ChangeEvent } from "react";
-import {GetStarted} from "./get-started-sdk/getStartedSdk";
+import { GetStarted } from "./get-started-sdk/getStartedSdk";
 import AuthenticationWorkflow from "./authentication-workflow/authenticationWorkflow";
 import Geofencing from "./geofencing/geofencing";
 import CloudProxy  from "./cloud-proxy/cloudProxy";
 import MediaEncryption from "./media-encryption/mediaEncryption";
-
-import config from "./agora-manager/config";
+import  AudioAndVoiceEffects from "./audio-and-voice-effects/audioAndVoiceEffects";
+import config from "./config";
 import CallQuality from "./ensure-call-quality/ensureCallQuality";
 
 type SelectedOption =
@@ -19,6 +19,7 @@ type SelectedOption =
   | "virtualBackground"
   | "authenticationWorkflow"
   | "geofencing"
+  | "audioEffects"
   | "";
 
 function App() {
@@ -31,7 +32,7 @@ function App() {
   const renderSelectedOption = () => {
     switch (selectedOption) {
       case "getStarted":
-        return <GetStarted config={config} title="Get Started with Video Calling"/>; // Step 2: Pass the title prop to GetStarted
+        return <GetStarted config={config} title="Get Started with Video Calling" />; // Step 2: Pass the title prop to GetStarted
       case "authenticationWorkflow":
         return <AuthenticationWorkflow />;
       case "geofencing":
@@ -40,6 +41,8 @@ function App() {
         return <MediaEncryption />;
       case "cloudProxy":
         return <CloudProxy />;
+      case "audioEffects":
+        return <AudioAndVoiceEffects/>
       case "callQuality":
         return <CallQuality />;
       default:
@@ -57,6 +60,7 @@ function App() {
           <option value="cloudProxy">Cloud Proxy</option>
           <option value="geofencing">Geofencing</option>
           <option value="mediaEncryption">Media Stream Encryption</option>
+          <option value="audioEffects">Audio and Voice Effects</option>
           <option value="callQuality">Ensure Call Quality</option>
         </select>
         {renderSelectedOption()}

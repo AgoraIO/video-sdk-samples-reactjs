@@ -4,9 +4,9 @@ const config: configType = {
   uid: 0,
   appId: "",
   channelName: "test",
-  rtcToken: "",
-  serverUrl: "",
-  proxyUrl: "http://localhost:8080/",
+  rtcToken: null,
+  serverUrl: "", // without trailing slash
+  proxyUrl: "http://localhost:8080/", // with trailing slash
   tokenExpiryTime: 600,
   token: "",
   encryptionMode: "aes-128-xts",

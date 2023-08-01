@@ -39,7 +39,7 @@ const useTokenWillExpire = () => {
   });
 };
 
-function AuthenticationWorkflowManager(props: { children?: React.ReactNode }) {
+function AuthenticationWorkflowManager(props:{children?: React.ReactNode}) {
   const [channelName, setChannelName] = useState<string>("");
   const [joined, setJoined] = useState(false);
   useTokenWillExpire();
@@ -64,20 +64,19 @@ function AuthenticationWorkflowManager(props: { children?: React.ReactNode }) {
     <div>
       {!joined ? (
         <>
-          <input
-            type="text"
-            value={channelName}
-            onChange={(e) => setChannelName(e.target.value)}
-            placeholder="Channel name"
-          />
-          <button onClick={() => setJoined(true)}>Join</button>
-          {props.children}
+        <input
+        type="text"
+        value={channelName}
+        onChange={(e) => setChannelName(e.target.value)}
+        placeholder="Channel name"/>
+        <button onClick={() => setJoined(true)}>Join</button>
+        {props.children}
         </>
       ) : (
         <>
-          <button onClick={() => setJoined(false)}>Leave</button>
-          {props.children}
-          <AgoraManager config={config} />
+        <button onClick={() => setJoined(false)}>Leave</button>
+        {props.children}
+        <AgoraManager config={config} />
         </>
       )}
     </div>
