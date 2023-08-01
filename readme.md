@@ -1,6 +1,6 @@
-# Agora Video SDK for ReactJS sample projects
+# Agora Video SDK for ReactJS reference app
 
-This repository holds the code examples used for the [Agora Video SDK for React ](https://docs.agora.io/en/video-calling/get-started/get-started-sdk?platform=web) documentation. Clone the repo, run and test the samples, and use the code in your own project. Enjoy.
+This repository holds the code examples used for the [Agora Video SDK for ReactJS ](https://docs.agora.io/en/video-calling/get-started/get-started-sdk?platform=web) documentation. Clone the repo, run and test the samples, and use the code in your own project. Enjoy.
 
 ## Samples  
 
