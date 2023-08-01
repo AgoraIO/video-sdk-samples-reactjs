@@ -9,7 +9,7 @@ function MediaEncryption() {
     <div>
       <h1>Secure channel encryption</h1>
       <AgoraRTCProvider client={agoraEngine}>
-      <MediaEncryptionManager />
+        <MediaEncryptionManager />
       </AgoraRTCProvider>
     </div>
   );
