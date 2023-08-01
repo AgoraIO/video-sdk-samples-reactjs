@@ -1,7 +1,7 @@
 import { useState, ChangeEvent } from "react";
-import {GetStarted} from "./get-started-sdk/getStartedSdk";
+import { GetStarted } from "./get-started-sdk/getStartedSdk";
 import AuthenticationWorkflow from "./authentication-workflow/authenticationWorkflow";
-import { AudioAndVoiceEffects } from "./audio-and-voice-effects/audioAndVoiceEffects";
+import  AudioAndVoiceEffects from "./audio-and-voice-effects/audioAndVoiceEffects";
 import config from "./config";
 import CallQuality from "./ensure-call-quality/ensureCallQuality";
 
@@ -28,7 +28,7 @@ function App() {
   const renderSelectedOption = () => {
     switch (selectedOption) {
       case "getStarted":
-        return <GetStarted config={config} title="Get Started with Video Calling"/>; // Step 2: Pass the title prop to GetStarted
+        return <GetStarted config={config} title="Get Started with Video Calling" />; // Step 2: Pass the title prop to GetStarted
       case "authenticationWorkflow":
         return <AuthenticationWorkflow />;
       case "audioEffects":
