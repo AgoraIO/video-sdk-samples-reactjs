@@ -21,7 +21,7 @@ async function fetchRTCToken(channelName: string) {
   }
 }
 
- const useTokenWillExpire = () => {
+const useTokenWillExpire = () => {
   const agoraEngine = useRTCClient();
   useClientEvent(agoraEngine, "token-privilege-will-expire", () => {
     if (config.serverUrl !== "") {
@@ -60,11 +60,9 @@ function AuthenticationWorkflowManager(props:{children?: React.ReactNode}) {
     }
   }, [channelName]);
 
-
   return (
     <div>
-      {!joined ? 
-      (
+      {!joined ? (
         <>
         <input
         type="text"
@@ -74,8 +72,7 @@ function AuthenticationWorkflowManager(props:{children?: React.ReactNode}) {
         <button onClick={() => setJoined(true)}>Join</button>
         {props.children}
         </>
-      ) : 
-      (
+      ) : (
         <>
         <button onClick={() => setJoined(false)}>Leave</button>
         {props.children}

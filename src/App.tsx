@@ -1,8 +1,9 @@
 import { useState, ChangeEvent } from "react";
 import {GetStarted} from "./get-started-sdk/getStartedSdk";
 import AuthenticationWorkflow from "./authentication-workflow/authenticationWorkflow";
-import audioAndVoiceEffects, { AudioAndVoiceEffects } from "./audio-and-voice-effects/audioAndVoiceEffects";
+import { AudioAndVoiceEffects } from "./audio-and-voice-effects/audioAndVoiceEffects";
 import config from "./config";
+import CallQuality from "./ensure-call-quality/ensureCallQuality";
 
 type SelectedOption =
   | "getStarted"
@@ -32,6 +33,8 @@ function App() {
         return <AuthenticationWorkflow />;
       case "audioEffects":
         return <AudioAndVoiceEffects/>
+      case "callQuality":
+        return <CallQuality />;
       default:
         return null;
     }
@@ -45,6 +48,7 @@ function App() {
           <option value="getStarted">Get Started</option>
           <option value="authenticationWorkflow">Authentication Workflow</option>
           <option value="audioEffects">Audio and Voice Effects</option>
+          <option value="callQuality">Ensure Call Quality</option>
         </select>
         {renderSelectedOption()}
     </div>
