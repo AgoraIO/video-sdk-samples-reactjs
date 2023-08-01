@@ -13,7 +13,7 @@ import {
   LocalVideoTrack,
 } from "agora-rtc-react";
 import { ICameraVideoTrack, ILocalAudioTrack } from "agora-rtc-sdk-ng";
-import config from "../config";
+import config from "../agora-manager/config";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
 
 function EnsureCallQualityManager(): JSX.Element {
