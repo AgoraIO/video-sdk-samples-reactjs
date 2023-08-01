@@ -14,7 +14,7 @@ interface GetStartedProps {
 
 export function GetStarted(props: GetStartedProps) 
 {
-  const client = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
   const [joined, setJoined] = useState(false);
 
   return (
@@ -25,7 +25,7 @@ export function GetStarted(props: GetStartedProps)
         <button onClick={() => setJoined(true)}>Join</button>
       ) : 
       (
-        <AgoraRTCProvider client={client}>
+        <AgoraRTCProvider client={agoraEngine}>
           <button onClick={() => setJoined(false)}>Leave</button>
           <AgoraManager config={config} />
         </AgoraRTCProvider>

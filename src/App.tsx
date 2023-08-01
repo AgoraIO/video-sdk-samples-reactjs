@@ -3,6 +3,7 @@ import {GetStarted} from "./get-started-sdk/getStartedSdk";
 import AuthenticationWorkflow from "./authentication-workflow/authenticationWorkflow";
 import config from "./config";
 import CallQuality from "./ensure-call-quality/ensureCallQuality";
+import ProductWorkflow from "./product-workflow/productWorkflow";
 
 type SelectedOption =
   | "getStarted"
@@ -31,6 +32,8 @@ function App() {
         return <AuthenticationWorkflow />;
       case "callQuality":
         return <CallQuality />;
+      case "productWorkflow":
+        return <ProductWorkflow/>
       default:
         return null;
     }
@@ -44,6 +47,7 @@ function App() {
           <option value="getStarted">Get Started</option>
           <option value="authenticationWorkflow">Authentication Workflow</option>
           <option value="callQuality">Ensure Call Quality</option>
+          <option value="productWorkflow">Screen Share and Volume Control</option>
         </select>
         {renderSelectedOption()}
     </div>
