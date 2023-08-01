@@ -1,6 +1,6 @@
 import "../App.css";
 import React, { useEffect, useRef, useState } from "react";
-import { usePublish, useRTCClient, useConnectionState, useTrackEvent } from "agora-rtc-react";
+import { usePublish, useConnectionState } from "agora-rtc-react";
 import AgoraRTC, { IBufferSourceAudioTrack } from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
 
@@ -44,7 +44,9 @@ const AudioAndVoiceEffectsComponent: React.FC = () => {
       if (deviceID) {
         console.log("The selected device id is: " + deviceID);
         try {
-          audioFileTrack.setPlaybackDevice(deviceID);
+          audioFileTrack.setPlaybackDevice(deviceID)
+          .then(() => {console.log("Audio route changed")})
+          .catch((error) => {console.error(error);});
         } catch (error) {
           console.error("Error setting playback device:", error);
         }
@@ -53,11 +55,14 @@ const AudioAndVoiceEffectsComponent: React.FC = () => {
   };
 
   // Event handler for selecting an audio file
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const selectedFile = event.target.files[0];
-      try {
-        setAudioFileTrack(await AgoraRTC.createBufferSourceAudioTrack({ source: selectedFile }));
+      try 
+      {
+        AgoraRTC.createBufferSourceAudioTrack({ source: selectedFile })
+        .then((track) => {setAudioFileTrack(track)})
+        .catch((error) => {console.error(error);})
       } catch (error) {
         console.error("Error creating buffer source audio track:", error);
       }
@@ -66,7 +71,8 @@ const AudioAndVoiceEffectsComponent: React.FC = () => {
 
   // Fetch the available audio playback devices when the component mounts
   useEffect(() => {
-    navigator.mediaDevices?.enumerateDevices?.().then((devices) => {
+    navigator.mediaDevices?.enumerateDevices?.().then((devices) => 
+    {
       try {
         const playbackDevices = devices.filter((device) => device.kind === "audiooutput");
         setPlaybackDevices(playbackDevices);
@@ -74,6 +80,10 @@ const AudioAndVoiceEffectsComponent: React.FC = () => {
       } catch (error) {
         console.error("Error enumerating playback devices:", error);
       }
+    })
+    .catch((error) => 
+    {
+      console.error(error);
     });
   }, []);
 

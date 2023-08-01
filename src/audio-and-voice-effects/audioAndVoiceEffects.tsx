@@ -3,12 +3,12 @@ import AgoraRTC from "agora-rtc-sdk-ng";
 import AudioAndVoiceEffectsManager from "./audioAndVoiceEffectsManager.tsx";
 
 function AudioAndVoiceEffects() {
-  const client = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
 
   return (
     <div>
       <h1>Audio and voice effects</h1>
-      <AgoraRTCProvider client={client}>
+      <AgoraRTCProvider client={agoraEngine}>
         <AudioAndVoiceEffectsManager />
       </AgoraRTCProvider>
     </div>
