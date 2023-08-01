@@ -3,7 +3,9 @@ import { useEffect } from "react";
 import { useRTCClient } from 'agora-rtc-react';
 import config from '../agora-manager/config.ts';
 import AuthenticationWorkflowManager from '../authentication-workflow/authenticationWorkflowManager.tsx';
-function base64ToUint8Array({ base64Str }) {
+
+function base64ToUint8Array(props: { base64Str: string }) {
+  const { base64Str } = props;
   const raw = window.atob(base64Str);
   const result = new Uint8Array(new ArrayBuffer(raw.length));
   for (let i = 0; i < raw.length; i += 1) {
@@ -12,7 +14,8 @@ function base64ToUint8Array({ base64Str }) {
   return result;
 }
 
-function hex2ascii({ hexx }) {
+function hex2ascii(props: { hexx: string }) {
+  const { hexx } = props;
   let str = '';
   for (let i = 0; i < hexx.length; i += 2) {
     str += String.fromCharCode(parseInt(hexx.substring(i, 2), 16));
@@ -39,7 +42,7 @@ function MediaEncryptionManager() {
   useMediaEncryption();
   return (
     <div>
-      <AuthenticationWorkflowManager/>
+      <AuthenticationWorkflowManager />
     </div>
   );
 }
