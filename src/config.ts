@@ -6,7 +6,7 @@ const config: configType = {
   channelName: "test",
   rtcToken: null,
   serverUrl: "", // without trailing slash
-  proxyUrl: "http://localhost:8080/", // without trailing slash
+  proxyUrl: "http://localhost:8080/", // with trailing slash
   tokenExpiryTime: 600,
   token: "",
   encryptionMode: "aes-128-xts",

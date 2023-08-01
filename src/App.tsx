@@ -1,6 +1,7 @@
 import { useState, ChangeEvent } from "react";
-import {GetStarted} from "./get-started-sdk/getStartedSdk";
+import { GetStarted } from "./get-started-sdk/getStartedSdk";
 import AuthenticationWorkflow from "./authentication-workflow/authenticationWorkflow";
+import  AudioAndVoiceEffects from "./audio-and-voice-effects/audioAndVoiceEffects";
 import config from "./config";
 import CallQuality from "./ensure-call-quality/ensureCallQuality";
 import ProductWorkflow from "./product-workflow/productWorkflow";
@@ -15,6 +16,7 @@ type SelectedOption =
   | "mediaPlaying"
   | "virtualBackground"
   | "authenticationWorkflow"
+  | "audioEffects"
   | "";
 
 function App() {
@@ -27,9 +29,11 @@ function App() {
   const renderSelectedOption = () => {
     switch (selectedOption) {
       case "getStarted":
-        return <GetStarted config={config} title="Get Started with Video Calling"/>; // Step 2: Pass the title prop to GetStarted
+        return <GetStarted config={config} title="Get Started with Video Calling" />; // Step 2: Pass the title prop to GetStarted
       case "authenticationWorkflow":
         return <AuthenticationWorkflow />;
+      case "audioEffects":
+        return <AudioAndVoiceEffects/>
       case "callQuality":
         return <CallQuality />;
       case "productWorkflow":
@@ -46,6 +50,7 @@ function App() {
           <option value="">Select</option>
           <option value="getStarted">Get Started</option>
           <option value="authenticationWorkflow">Authentication Workflow</option>
+          <option value="audioEffects">Audio and Voice Effects</option>
           <option value="callQuality">Ensure Call Quality</option>
           <option value="productWorkflow">Screen Share and Volume Control</option>
         </select>
