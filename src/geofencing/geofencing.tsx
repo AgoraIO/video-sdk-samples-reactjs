@@ -5,11 +5,11 @@ import { useRTCClient, AgoraRTCProvider } from "agora-rtc-react";
 export function Geofencing()
 {
 
-    const client = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+    const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
     return (
       <div>
         <h1>Geofencing</h1>
-        <AgoraRTCProvider client={client}>
+        <AgoraRTCProvider client={agoraEngine}>
           <GeofencingManager />
         </AgoraRTCProvider>
       </div>

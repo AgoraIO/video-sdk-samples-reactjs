@@ -1,4 +1,5 @@
 // Import statements
+import { useEffect } from "react";
 import { useRTCClient } from 'agora-rtc-react';
 import config from '../agora-manager/config.ts';
 import AuthenticationWorkflowManager from '../authentication-workflow/authenticationWorkflowManager.tsx';
@@ -14,21 +15,24 @@ function base64ToUint8Array({ base64Str }) {
 function hex2ascii({ hexx }) {
   let str = '';
   for (let i = 0; i < hexx.length; i += 2) {
-    str += String.fromCharCode(parseInt(hexx.substr(i, 2), 16));
+    str += String.fromCharCode(parseInt(hexx.substring(i, 2), 16));
   }
   return str;
 }
 
+
 const useMediaEncryption = () => {
   const agoraEngine = useRTCClient();
-  // Convert the salt string to base64ToUint8Array.
-  const salt = base64ToUint8Array({ base64Str: config.salt });
-  // Convert the cipherKey string to hex2ascii.
-  config.cipherKey = hex2ascii({ hexx: config.cipherKey });
-  // Set an encryption mode.
-  config.encryptionMode = 'aes-256-gcm2';
-  // Start channel encryption
-  agoraEngine.setEncryptionConfig(config.encryptionMode, config.cipherKey, salt);
+  useEffect(() => {
+    // Convert the salt string to base64ToUint8Array.
+    const salt = base64ToUint8Array({ base64Str: config.salt }) || config.salt;
+    // Convert the cipherKey string to hex2ascii.
+    const cipherKey = hex2ascii({ hexx: config.cipherKey }) || config.cipherKey;
+    // Set an encryption mode.
+    const encryptionMode = config.encryptionMode || "aes-256-gcm2";
+    // Start channel encryption
+    agoraEngine.setEncryptionConfig(encryptionMode, cipherKey, salt);
+  }, []); // Empty dependency array ensures the effect runs only once when the component mounts
 };
 
 function MediaEncryptionManager() {

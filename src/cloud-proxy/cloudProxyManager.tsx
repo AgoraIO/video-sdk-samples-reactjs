@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   useRTCClient,
   useClientEvent
@@ -6,7 +7,11 @@ import AuthenticationWorkflowManager from "../authentication-workflow/authentica
 
 const useCloudProxy = () => {
   const agoraEngine = useRTCClient();
+  useEffect(() => {
+
   agoraEngine.startProxyServer(3);
+  }, []);
+
   useClientEvent(agoraEngine, "is-using-cloud-proxy", (isUsingProxy) => {
       // Display the proxy server state based on the isUsingProxy Boolean variable.
       if(isUsingProxy == true)
