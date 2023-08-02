@@ -64,13 +64,13 @@ const CallQualityFeaturesComponent: React.FC = () => {
   };
 
   const updateNetworkStatus = () => {
-    const networkLables = {
+    const networkLabels = {
       0: 'Unknown', 1: 'Excellent',
       2: 'Good', 3: 'Poor',
       4: 'Bad', 5: 'Very Bad',
       6: 'No Connection'
     }
-    return <label>Network Quality: {networkLables[networkQuality.uplink]}</label>;
+    return <label>Network Quality: {networkLabels[networkQuality.uplink]}</label>;
   };
 
   const showStatistics = () => {
