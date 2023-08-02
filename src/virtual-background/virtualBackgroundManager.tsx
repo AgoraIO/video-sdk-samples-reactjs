@@ -18,6 +18,7 @@ function VirtualBackgroundComponent() {
   const [processors, setVirtualBackgroundExtension] = useState<IVirtualBackgroundProcessor | null>(null);
   const [isVirtualBackground, setVirtualBackground] = useState(false);
   const { localCameraTrack } = useLocalCameraTrack();
+  const path = "/path/to/your/image";
   const connectionState = useConnectionState();
 
   const enableVirtualBackground = async () => {
@@ -63,7 +64,7 @@ function VirtualBackgroundComponent() {
       return;
     }
     const processorOptions = {};
-
+    const image = new Image();
     switch (event.target.value) {
       case "color":
         processorOptions.type = "color";
@@ -74,12 +75,11 @@ function VirtualBackgroundComponent() {
         processorOptions.blurDegree = 2;
         break;
       case "image":
-        const image = new Image();
         image.onload = () => {
           processorOptions.type = "img";
           processorOptions.source = image;
         };
-        image.src = "/path/to/your/image"; // Replace with the actual image path
+        image.src = path; // Replace with the actual image path
         image.alt = "sourceImage";
         break;
       default:
