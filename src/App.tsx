@@ -7,7 +7,7 @@ import MediaEncryption from "./media-encryption/mediaEncryption";
 import  AudioAndVoiceEffects from "./audio-and-voice-effects/audioAndVoiceEffects";
 import config from "./agora-manager/config";
 import CallQuality from "./ensure-call-quality/ensureCallQuality";
-
+import MediaPlaying from "./play-media/playMedia";
 type SelectedOption =
   | "getStarted"
   | "callQuality"
@@ -20,6 +20,7 @@ type SelectedOption =
   | "authenticationWorkflow"
   | "geofencing"
   | "audioEffects"
+  | "mediaPlaying"
   | "";
 
 function App() {
@@ -45,6 +46,8 @@ function App() {
         return <AudioAndVoiceEffects/>
       case "callQuality":
         return <CallQuality />;
+      case "mediaPlaying":
+        return <MediaPlaying />
       default:
         return null;
     }
@@ -62,6 +65,7 @@ function App() {
           <option value="mediaEncryption">Media Stream Encryption</option>
           <option value="audioEffects">Audio and Voice Effects</option>
           <option value="callQuality">Ensure Call Quality</option>
+          <option value="mediaPlaying">Stream media to a channel</option>
         </select>
         {renderSelectedOption()}
     </div>
