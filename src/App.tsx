@@ -2,9 +2,8 @@ import { useState, ChangeEvent } from "react";
 import { GetStarted } from "./get-started-sdk/getStartedSdk";
 import AuthenticationWorkflow from "./authentication-workflow/authenticationWorkflow";
 import  AudioAndVoiceEffects from "./audio-and-voice-effects/audioAndVoiceEffects";
-import config from "./config";
+import config from "./agora-manager/config";
 import CallQuality from "./ensure-call-quality/ensureCallQuality";
-
 type SelectedOption =
   | "getStarted"
   | "callQuality"
@@ -35,6 +34,8 @@ function App() {
         return <AudioAndVoiceEffects/>
       case "callQuality":
         return <CallQuality />;
+        case "virtualBackground":
+          return <VirtualBackground />
       default:
         return null;
     }
@@ -49,6 +50,7 @@ function App() {
           <option value="authenticationWorkflow">Authentication Workflow</option>
           <option value="audioEffects">Audio and Voice Effects</option>
           <option value="callQuality">Ensure Call Quality</option>
+          <option value="virtualBackground">Virtual Background</option>
         </select>
         {renderSelectedOption()}
     </div>
