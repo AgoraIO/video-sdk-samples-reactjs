@@ -90,7 +90,7 @@ function VirtualBackgroundComponent() {
   };
 
   return (
-    <div>zswqza
+    <div>
       <select onChange={handleOptionChange} disabled = {connectionState === "DISCONNECTED"}>
         <option value="">Select</option>
         <option value="color">Color</option>

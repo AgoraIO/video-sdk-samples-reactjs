@@ -7,7 +7,7 @@ import {
   usePublish,
   useRemoteUsers,
 } from "agora-rtc-react";
-import configImport, { configType } from "../config.ts"; // Assuming the config.ts file is in the same directory as App.tsx
+import configImport, { configType } from "../agora-manager/config"; // Assuming the config.ts file is in the same directory as App.tsx
 interface AgoraManagerProps {
   config: configType;
 }
@@ -31,11 +31,11 @@ export function AgoraManager(props: AgoraManagerProps) {
 
   return (
     <div id="videos">
-      <div className="vid" style={{ height: 300, width: 600 }}>
+      <div className="vid" style={{ height: 450, width: 600 }}>
         <LocalVideoTrack track={localCameraTrack} play={true} />
       </div>
       {remoteUsers.map((remoteUser) => (
-        <div className="vid" style={{ height: 300, width: 600 }} key={remoteUser.uid}>
+        <div className="vid" style={{ height: 450, width: 600 }} key={remoteUser.uid}>
           <RemoteUser user={remoteUser} playVideo={true} playAudio={true} />
         </div>
       ))}

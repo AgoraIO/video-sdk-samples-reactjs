@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AgoraManager } from "../agora-manager/agoraManager.tsx";
-import config from "../config.ts";
+import config from "../agora-manager/config.tsx";
 import { useClientEvent, useRTCClient } from "agora-rtc-react";
 
 async function fetchRTCToken(channelName: string) {

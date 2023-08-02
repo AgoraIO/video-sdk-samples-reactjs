@@ -4,6 +4,7 @@ import AuthenticationWorkflow from "./authentication-workflow/authenticationWork
 import  AudioAndVoiceEffects from "./audio-and-voice-effects/audioAndVoiceEffects";
 import config from "./agora-manager/config";
 import CallQuality from "./ensure-call-quality/ensureCallQuality";
+import VirtualBackground from "./virtual-background/virtualBackground";
 type SelectedOption =
   | "getStarted"
   | "callQuality"
