@@ -122,7 +122,7 @@ const CallQualityFeaturesComponent: React.FC = () => {
     usePublish([props.screenTrack], true, screenShareClient.current);
     return (
       <>
-        <p>Screen sharing e</p>
+        <p>Screen sharing enabled</p>
       </>
     );
   };
