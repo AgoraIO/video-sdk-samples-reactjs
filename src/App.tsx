@@ -4,6 +4,7 @@ import AuthenticationWorkflow from "./authentication-workflow/authenticationWork
 import  AudioAndVoiceEffects from "./audio-and-voice-effects/audioAndVoiceEffects";
 import config from "./config";
 import CallQuality from "./ensure-call-quality/ensureCallQuality";
+import CustomVideoAndAudio from "./custom-video-and-audio/customVideoAudio";
 
 type SelectedOption =
   | "getStarted"
@@ -16,6 +17,7 @@ type SelectedOption =
   | "virtualBackground"
   | "authenticationWorkflow"
   | "audioEffects"
+  | "customMediaSources"
   | "";
 
 function App() {
@@ -35,6 +37,8 @@ function App() {
         return <AudioAndVoiceEffects/>
       case "callQuality":
         return <CallQuality />;
+      case "customMediaSources":
+        return <CustomVideoAndAudio/>;
       default:
         return null;
     }
@@ -49,6 +53,7 @@ function App() {
           <option value="authenticationWorkflow">Authentication Workflow</option>
           <option value="audioEffects">Audio and Voice Effects</option>
           <option value="callQuality">Ensure Call Quality</option>
+          <option value="customMediaSources">Custom Video and Audio</option>
         </select>
         {renderSelectedOption()}
     </div>
