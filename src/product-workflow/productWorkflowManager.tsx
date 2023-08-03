@@ -8,6 +8,7 @@ import {
   useConnectionState,
   useJoin,
   usePublish,
+  LocalVideoTrack,
 } from "agora-rtc-react";
 import {
   DeviceInfo,
@@ -67,19 +68,23 @@ const CallQualityFeaturesComponent: React.FC = () => {
   const remoteUsers = useRemoteUsers();
   const numberOfRemoteUsers = remoteUsers.length;
   const remoteUser = remoteUsers[numberOfRemoteUsers - 1];
-  const [isSharingEnabled, setSharingEnabled] = useState(false);
+  const [isSharingEnabled, setScreenSharing] = useState(false);
   const [isMuteVideo, setMuteVideo] = useState(false);
   const connectionState = useConnectionState();
   const screenRef = React.useRef<ILocalVideoTrack>();
-  const [isScreensharing, setScreensharing] = useState(false);
 
-  const toggleSharing = async () => {
-    if (isScreensharing) {
+  const toggleSharing = () => {
+    if (isSharingEnabled) {
       screenRef.current?.close();
-      setScreensharing(false);
+      setScreenSharing(false);
     } else {
-      screenRef.current = await AgoraRTC.createScreenVideoTrack({}, "disable");
-      setScreensharing(true);
+       AgoraRTC.createScreenVideoTrack({}, "disable")
+      .then((track) => {
+        setMuteVideo((!isSharingEnabled));
+        screenRef.current = track;
+      })
+      .catch((error) => console.error(error));
+      setScreenSharing(true);
     }
   };
 
@@ -102,6 +107,26 @@ const CallQualityFeaturesComponent: React.FC = () => {
     }
   };
 
+  const ScreenShare = (props: { screenTrack: ILocalVideoTrack }) => {
+    const screenShareClient = useRef(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+    useJoin(
+      {
+        appid: config.appId,
+        channel: config.channelName,
+        token: null,
+        uid: 0,
+      },
+      true,
+      screenShareClient.current
+    );
+    usePublish([props.screenTrack], true, screenShareClient.current);
+    return (
+      <>
+        <p>Screen sharing e</p>
+      </>
+    );
+  };
+
   const toggleMuteVideo = () => {
     if (connectionState === "DISCONNECTED") {
       console.log("Join a channel to mute/unmute the local video");
@@ -116,9 +141,9 @@ const CallQualityFeaturesComponent: React.FC = () => {
   return (
     <div>
       {connectionState === "CONNECTED" && (
-        <button onClick={toggleSharing}>{isScreensharing ? "Stop Screenshare" : "Start Screenshare"}</button>
+        <button onClick={toggleSharing}>{isSharingEnabled ? "Stop Sharing" : "Start Sharing"}</button>
       )}
-      {isScreensharing && screenRef.current && <Screenshare screenTrack={screenRef.current}></Screenshare>}
+      {isSharingEnabled && screenRef.current && (<ScreenShare screenTrack={screenRef.current}></ScreenShare>)}
       <br />
       {isMuteVideo ? (
         <button type="button" onClick={toggleMuteVideo}>
@@ -137,27 +162,8 @@ const CallQualityFeaturesComponent: React.FC = () => {
         <label> Remote Audio Level :</label>
         <input type="range" min="0" max="100" step="1" onChange={handleRemoteAudioVolumeChange} />
       </div>
+      {screenRef.current && <LocalVideoTrack track ={screenRef.current} play = {true} style={{width: 600, height: 300}}/>}
     </div>
-  );
-};
-
-const Screenshare = (props: { screenTrack: ILocalVideoTrack }) => {
-  const screenShareClient = useRef(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
-  useJoin(
-    {
-      appid: config.appId,
-      channel: config.channelName,
-      token: null,
-      uid: 0,
-    },
-    true,
-    screenShareClient.current
-  );
-  usePublish([props.screenTrack], true, screenShareClient.current);
-  return (
-    <>
-      <p>Screensharing Active</p>
-    </>
   );
 };
 
