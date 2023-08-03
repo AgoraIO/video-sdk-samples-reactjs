@@ -14,11 +14,11 @@ type SelectedOption =
   | "audioEffects"
   | "productWorkflow"
   | "cloudProxy"
-  | "mediaEncryption"
   | "virtualBackground"
   | "authenticationWorkflow"
   | "geofencing"
   | "audioEffects"
+  | "mediaPlaying"
   | "mediaPlaying"
   | "";
 
