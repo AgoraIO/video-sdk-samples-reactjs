@@ -15,7 +15,6 @@ type SelectedOption =
   | "productWorkflow"
   | "cloudProxy"
   | "mediaEncryption"
-  | "mediaPlaying"
   | "virtualBackground"
   | "authenticationWorkflow"
   | "geofencing"
@@ -38,8 +37,6 @@ function App() {
         return <AuthenticationWorkflow />;
       case "geofencing":
         return <Geofencing />;
-      case "mediaEncryption":
-        return <MediaEncryption />;
       case "cloudProxy":
         return <CloudProxy />;
       case "audioEffects":
@@ -62,7 +59,6 @@ function App() {
           <option value="authenticationWorkflow">Authentication Workflow</option>
           <option value="cloudProxy">Cloud Proxy</option>
           <option value="geofencing">Geofencing</option>
-          <option value="mediaEncryption">Media Stream Encryption</option>
           <option value="audioEffects">Audio and Voice Effects</option>
           <option value="callQuality">Ensure Call Quality</option>
           <option value="mediaPlaying">Stream media to a channel</option>
