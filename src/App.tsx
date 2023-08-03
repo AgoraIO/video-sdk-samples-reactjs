@@ -3,7 +3,6 @@ import { GetStarted } from "./get-started-sdk/getStartedSdk";
 import AuthenticationWorkflow from "./authentication-workflow/authenticationWorkflow";
 import Geofencing from "./geofencing/geofencing";
 import CloudProxy  from "./cloud-proxy/cloudProxy";
-import MediaEncryption from "./media-encryption/mediaEncryption";
 import  AudioAndVoiceEffects from "./audio-and-voice-effects/audioAndVoiceEffects";
 import config from "./agora-manager/config";
 import CallQuality from "./ensure-call-quality/ensureCallQuality";
@@ -18,7 +17,6 @@ type SelectedOption =
   | "authenticationWorkflow"
   | "geofencing"
   | "audioEffects"
-  | "mediaPlaying"
   | "mediaPlaying"
   | "";
 
