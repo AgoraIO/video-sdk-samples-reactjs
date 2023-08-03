@@ -4,13 +4,13 @@ const config: configType = {
   uid: 0,
   appId: "",
   channelName: "test",
-  rtcToken: null,
-  serverUrl: "", // without trailing slash
-  proxyUrl: "http://localhost:8080/", // with trailing slash
+  rtcToken: "",
+  serverUrl: "",
+  proxyUrl: "http://localhost:8080/",
   tokenExpiryTime: 600,
   token: "",
   encryptionMode: "aes-128-xts",
-  salt: new Uint8Array(),
+  salt: "",
   cipherKey: "",
 };
 
@@ -24,7 +24,7 @@ export type configType = {
   tokenExpiryTime: number;
   token: string;
   encryptionMode: EncryptionMode;
-  salt: Uint8Array;
+  salt: string;
   cipherKey: string;
 };
 

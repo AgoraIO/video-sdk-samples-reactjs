@@ -7,7 +7,7 @@ import {
   usePublish,
   useRemoteUsers,
 } from "agora-rtc-react";
-import configImport, { configType } from "../config.ts"; // Assuming the config.ts file is in the same directory as App.tsx
+import configImport, { configType } from "./config.ts"; // Assuming the config.ts file is in the same directory as App.tsx
 interface AgoraManagerProps {
   config: configType;
 }
