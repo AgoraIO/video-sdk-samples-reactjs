@@ -6,9 +6,24 @@ This repository holds the code examples used for the [Agora Video SDK for ReactJ
 
 The runnable code examples are:
 
-- [SDK quickstart](./src//get-started-sdk/get-started-sdk.tsx) - The minimum code you need to integrate high-quality, low-latency Video 
+- [SDK quickstart](./src/get-started-sdk/README.md) - The minimum code you need to integrate high-quality, low-latency Video 
   Calling features into your app using Video SDK.
-- [Authentication Workflow](./src/AuthenticationWorflow) - Authenticate the current user and channel with a token retrieved from a token server.
+- [Authentication Workflow](./src/authentication-workflow/README.md) - Authenticate the current user and channel with a token 
+  retrieved from a token server.
+- [Connect through restricted networks with Cloud Proxy](./src/cloud-proxy/README.md) - Connect from an environment 
+  with a restricted network.
+- [Stream media to a channel](./src/play-media/README.md) - Use the media player classes in Video SDK to enable your 
+  users to publish media files to a channel.
+- [Call quality best practice](./src/ensure-call-quality/README.md) - use Video SDK features to  ensure optimal audio and video quality in your app.
+- [Audio and voice effects](./src/audio-and-voice-effects/README.md) - Modify the captured audio to add sound 
+  effects, mix in a pre-recorded audio, or change the voice quality. 
+
+- [Geofencing](./src/geofencing/README.md) - Control and customize data routing in your app by specifying the Agora SD-RTN™ 
+  region users 
+  connect to.
+
+
+
 
 
 
