@@ -1,8 +1,9 @@
 import "../App.css";
 import React, { useEffect, useRef, useState } from "react";
-import { usePublish, useConnectionState } from "agora-rtc-react";
+import { usePublish, useConnectionState, useRTCClient } from "agora-rtc-react";
 import AgoraRTC, { IBufferSourceAudioTrack } from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
+import { useAgoraContext } from "../agora-manager/agoraManager";
 
 function AudioAndVoiceEffectsManager(): JSX.Element {
   return (
@@ -16,13 +17,31 @@ function AudioAndVoiceEffectsManager(): JSX.Element {
 
 const AudioMixing: React.FC<{ track: IBufferSourceAudioTrack }> = ({ track }) => {
   usePublish([track]);
-
+  const agoraEngine = useRTCClient();
   useEffect(() => {
     track.startProcessAudioBuffer();
     track.play(); // to play the track for the local user
+    agoraEngine.publish(track)
+    .then(() =>
+    {
+      console.log("New track published");
+    })
+    .catch((error) =>
+    {
+      console.log(console.log(error));
+    });
     return () => {
       track.stopProcessAudioBuffer();
       track.stop();
+      agoraEngine.unpublish(track).
+      then(() =>
+      {
+        console.log("New track unpublished");
+      })
+      .catch((error) =>
+      {
+        console.log(console.log(error));
+      });
     };
   }, [track]);
 
@@ -45,7 +64,7 @@ const AudioAndVoiceEffectsComponent: React.FC = () => {
         console.log("The selected device id is: " + deviceID);
         try {
           audioFileTrack.setPlaybackDevice(deviceID)
-          .then(() => {cosole.log("Audio route changed")})
+          .then(() => {console.log("Audio route changed")})
           .catch((error) => {console.error(error);});
         } catch (error) {
           console.error("Error setting playback device:", error);
