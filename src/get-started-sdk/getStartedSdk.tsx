@@ -4,10 +4,9 @@ import {
   useRTCClient
 } from "agora-rtc-react";
 import AgoraRTC from "agora-rtc-sdk-ng";
-import configImport, { configType } from "../config"; // Assuming the config.ts file is in the same directory as App.tsx
+import configImport, { configType } from "../agora-manager/config"; // Assuming the config.ts file is in the same directory as App.tsx
 import {AgoraManager} from "../agora-manager/agoraManager";
-import config from "../config";
-import { useAgoraContext } from "../agora-manager/agoraManager";
+import config from "../agora-manager/config";
 interface GetStartedProps {
   title: string;
   config: configType;
