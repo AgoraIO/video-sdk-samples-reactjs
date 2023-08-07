@@ -8,7 +8,7 @@ import {
   usePublish,
   useRemoteUsers,
 } from "agora-rtc-react";
-import configImport, { configType } from "../config";
+import configImport, { configType } from "./config";
 // AgoraContext.tsx
 import React, { createContext, useContext } from "react";
 import { ILocalAudioTrack, ILocalVideoTrack } from "agora-rtc-sdk-ng";
