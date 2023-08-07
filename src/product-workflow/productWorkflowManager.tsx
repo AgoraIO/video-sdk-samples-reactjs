@@ -1,8 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
-  useRTCClient,
   useRemoteUsers,
-  useClientEvent,
   useLocalMicrophoneTrack,
   useLocalCameraTrack,
   useLocalScreenTrack,
@@ -11,15 +9,13 @@ import {
   usePublish,
   LocalVideoTrack,
 } from "agora-rtc-react";
-import {
+import AgoraRTC, {
   DeviceInfo,
-  IAgoraRTCClient,
   ICameraVideoTrack,
   ILocalVideoTrack,
   IMicrophoneAudioTrack,
 } from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
-import AgoraRTC from "agora-rtc-sdk-ng";
 import config from "../config";
 
 function ProductWorkflowManager(): JSX.Element {
@@ -33,7 +29,6 @@ function ProductWorkflowManager(): JSX.Element {
 }
 
 const CallQualityFeaturesComponent: React.FC = () => {
-  const agoraEngine = useRTCClient();
   const { localCameraTrack } = useLocalCameraTrack();
   const { localMicrophoneTrack } = useLocalMicrophoneTrack();
   const remoteUsers = useRemoteUsers();
@@ -43,8 +38,8 @@ const CallQualityFeaturesComponent: React.FC = () => {
   const [isMuteVideo, setMuteVideo] = useState(false);
   const connectionState = useConnectionState();
 
-  useOnCameraChanged(agoraEngine, localCameraTrack);
-  useOnMicrophoneChanged(agoraEngine, localMicrophoneTrack);
+  useOnCameraChanged(localCameraTrack);
+  useOnMicrophoneChanged(localMicrophoneTrack);
 
   const handleLocalAudioVolumeChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseInt(evt.target.value);
@@ -127,36 +122,45 @@ const ScreenShare = () => {
   );
 };
 
-const useOnMicrophoneChanged = (agoraEngine: IAgoraRTCClient, localMicrophoneTrack: IMicrophoneAudioTrack | null) => {
-  // do you intend to use TrackEvent instead? this event doesn't seem to exist here
-  useClientEvent(agoraEngine, "onMicrophoneChanged", (changedDevice: DeviceInfo) => {
-    if (changedDevice.state === "ACTIVE") {
-      localMicrophoneTrack
-        ?.setDevice(changedDevice.device.deviceId)
-        .then(() => console.log(""))
-        .catch((error) => console.error(error));
-    } else if (changedDevice.device.label === localMicrophoneTrack?.getTrackLabel()) {
-      AgoraRTC.getMicrophones()
-        .then((devices) => localMicrophoneTrack?.setDevice(devices[0].deviceId))
-        .catch((error) => console.error(error));
+const useOnMicrophoneChanged = (localMicrophoneTrack: IMicrophoneAudioTrack | null) => {
+  useEffect(() => {
+    AgoraRTC.onMicrophoneChanged = ((changedDevice: DeviceInfo) => {
+      if (changedDevice.state === "ACTIVE") {
+        localMicrophoneTrack
+          ?.setDevice(changedDevice.device.deviceId)
+          .then(() => console.log(""))
+          .catch((error) => console.error(error));
+      } else if (changedDevice.device.label === localMicrophoneTrack?.getTrackLabel()) {
+        AgoraRTC.getMicrophones()
+          .then((devices) => localMicrophoneTrack?.setDevice(devices[0].deviceId))
+          .catch((error) => console.error(error));
+      }
+    });
+    return () => {
+      AgoraRTC.onMicrophoneChanged = undefined;
     }
-  });
+  }, [localMicrophoneTrack]);
+
 };
 
-const useOnCameraChanged = (agoraEngine: IAgoraRTCClient, localCameraTrack: ICameraVideoTrack | null) => {
-  // do you intend to use TrackEvent instead? this event doesn't seem to exist here
-  useClientEvent(agoraEngine, "onCameraChanged", (changedDevice: DeviceInfo) => {
-    if (changedDevice.state === "ACTIVE") {
-      localCameraTrack
-        ?.setDevice(changedDevice.device.deviceId)
-        .then(() => console.log(""))
-        .catch((error) => console.error(error));
-    } else if (changedDevice.device.label === localCameraTrack?.getTrackLabel()) {
-      AgoraRTC.getCameras()
-        .then((devices) => localCameraTrack?.setDevice(devices[0].deviceId))
-        .catch((error) => console.error(error));
+const useOnCameraChanged = (localCameraTrack: ICameraVideoTrack | null) => {
+  useEffect(() => {
+    AgoraRTC.onCameraChanged = ((changedDevice: DeviceInfo) => {
+      if (changedDevice.state === "ACTIVE") {
+        localCameraTrack
+          ?.setDevice(changedDevice.device.deviceId)
+          .then(() => console.log(""))
+          .catch((error) => console.error(error));
+      } else if (changedDevice.device.label === localCameraTrack?.getTrackLabel()) {
+        AgoraRTC.getCameras()
+          .then((devices) => localCameraTrack?.setDevice(devices[0].deviceId))
+          .catch((error) => console.error(error));
+      }
+    });
+    return () => {
+      AgoraRTC.onCameraChanged = undefined;
     }
-  });
+  }, [localCameraTrack]);
 };
 
 export default ProductWorkflowManager;
