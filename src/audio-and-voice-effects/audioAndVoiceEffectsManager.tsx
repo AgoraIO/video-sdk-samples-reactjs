@@ -45,7 +45,7 @@ const AudioAndVoiceEffectsComponent: React.FC = () => {
         console.log("The selected device id is: " + deviceID);
         try {
           audioFileTrack.setPlaybackDevice(deviceID)
-          .then(() => {console.log("Audio route changed")})
+          .then(() => {cosole.log("Audio route changed")})
           .catch((error) => {console.error(error);});
         } catch (error) {
           console.error("Error setting playback device:", error);

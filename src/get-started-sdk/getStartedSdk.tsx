@@ -4,9 +4,10 @@ import {
   useRTCClient
 } from "agora-rtc-react";
 import AgoraRTC from "agora-rtc-sdk-ng";
-import configImport, { configType } from "../config.ts"; // Assuming the config.ts file is in the same directory as App.tsx
-import {AgoraManager} from "../agora-manager/agoraManager.tsx";
-import config from "../config.ts";
+import configImport, { configType } from "../config"; // Assuming the config.ts file is in the same directory as App.tsx
+import {AgoraManager} from "../agora-manager/agoraManager";
+import config from "../config";
+import { useAgoraContext } from "../agora-manager/agoraManager";
 interface GetStartedProps {
   title: string;
   config: configType;
@@ -27,7 +28,8 @@ export function GetStarted(props: GetStartedProps)
       (
         <AgoraRTCProvider client={client}>
           <button onClick={() => setJoined(false)}>Leave</button>
-          <AgoraManager config={config} />
+          <AgoraManager config={config}>
+          </AgoraManager>
         </AgoraRTCProvider>
       )}
     </div>

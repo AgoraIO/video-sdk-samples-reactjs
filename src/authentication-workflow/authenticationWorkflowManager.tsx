@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { AgoraManager } from "../agora-manager/agoraManager.tsx";
-import config from "../config.ts";
+import { AgoraManager, AgoraProvider } from "../agora-manager/agoraManager";
+import config from "../config";
 import { useClientEvent, useRTCClient } from "agora-rtc-react";
 
 async function fetchRTCToken(channelName: string) {
@@ -70,13 +70,13 @@ function AuthenticationWorkflowManager(props:{children?: React.ReactNode}) {
         onChange={(e) => setChannelName(e.target.value)}
         placeholder="Channel name"/>
         <button onClick={() => setJoined(true)}>Join</button>
-        {props.children}
         </>
       ) : (
         <>
         <button onClick={() => setJoined(false)}>Leave</button>
+        <AgoraManager config={config}>
         {props.children}
-        <AgoraManager config={config} />
+        </AgoraManager>
         </>
       )}
     </div>

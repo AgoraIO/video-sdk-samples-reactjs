@@ -2,9 +2,9 @@ import { useState, ChangeEvent } from "react";
 import { GetStarted } from "./get-started-sdk/getStartedSdk";
 import AuthenticationWorkflow from "./authentication-workflow/authenticationWorkflow";
 import  AudioAndVoiceEffects from "./audio-and-voice-effects/audioAndVoiceEffects";
-import config from "./config";
 import CallQuality from "./ensure-call-quality/ensureCallQuality";
-import CustomVideoAndAudio from "./custom-video-and-audio/customVideoAudio";
+import CustomVideoAndAudio from "./custom-audio-and-video/customVideoAudio";
+//import CustomVideoAndAudio from "./custom-video-and-audio/customVideoAudio";
 
 type SelectedOption =
   | "getStarted"
@@ -30,7 +30,7 @@ function App() {
   const renderSelectedOption = () => {
     switch (selectedOption) {
       case "getStarted":
-        return <GetStarted config={config} title="Get Started with Video Calling" />; // Step 2: Pass the title prop to GetStarted
+        return <GetStarted title="Get Started with Video Calling" />; // Step 2: Pass the title prop to GetStarted
       case "authenticationWorkflow":
         return <AuthenticationWorkflow />;
       case "audioEffects":
@@ -38,7 +38,7 @@ function App() {
       case "callQuality":
         return <CallQuality />;
       case "customMediaSources":
-        return <CustomVideoAndAudio/>;
+        return <CustomVideoAndAudio/>
       default:
         return null;
     }
