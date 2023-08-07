@@ -19,10 +19,7 @@ const CustomAudioTrack: React.FC<{ customAudioTrack: ILocalAudioTrack | null }> 
   const agoraContext = useAgoraContext();
 
   useEffect(() => {
-    console.log(customAudioTrack);
-    console.log(agoraContext.localMicrophoneTrack);
     if (customAudioTrack && agoraContext.localMicrophoneTrack) {
-      console.log
       agoraContext.localMicrophoneTrack.stop(); // Stop the default microphone track
       customAudioTrack?.play(); // Play the custom audio track for the local user
     }
@@ -32,22 +29,18 @@ const CustomAudioTrack: React.FC<{ customAudioTrack: ILocalAudioTrack | null }> 
     };
   }, [customAudioTrack, agoraContext.localMicrophoneTrack]);
 
-  return null;
+  return <></>;
 };
 
 const CustomVideoTrack: React.FC<{ customVideoTrack: ILocalVideoTrack | null }> = ({ customVideoTrack }) => {
   const agoraContext = useAgoraContext();
-  useEffect(() => 
-  {
 
+  useEffect(() => {
     if (customVideoTrack && agoraContext.localCameraTrack) {
       const mediaStreamTrack = customVideoTrack.getMediaStreamTrack();
-      agoraContext.localCameraTrack.replaceTrack(mediaStreamTrack,true)
-      .then(() =>
-      {
-        console.log("The default local video track has been changed");
-      })
-      .catch((error) => {console.log(error)})    
+      agoraContext.localCameraTrack.replaceTrack(mediaStreamTrack, true)
+        .then(() => console.log("The default local video track has been changed"))
+        .catch((error) => { console.log(error) })
     }
 
     return () => {
@@ -55,7 +48,7 @@ const CustomVideoTrack: React.FC<{ customVideoTrack: ILocalVideoTrack | null }> 
     };
   }, [agoraContext.localCameraTrack, customVideoTrack]);
 
-  return null;
+  return <></>;
 };
 
 const CustomVideoAndAudioComponent: React.FC = () => {
@@ -73,8 +66,7 @@ const CustomVideoAndAudioComponent: React.FC = () => {
         const videoMediaStreamTracks = stream.getVideoTracks();
         setCustomAudioTrack(AgoraRTC.createCustomAudioTrack({ mediaStreamTrack: audioMediaStreamTracks[0] }));
         setCustomVideoTrack(AgoraRTC.createCustomVideoTrack({ mediaStreamTrack: videoMediaStreamTracks[0] }));
-      })
-      .catch((error) => console.error(error));
+      }).catch((error) => console.error(error));
   };
 
   useEffect(() => {
