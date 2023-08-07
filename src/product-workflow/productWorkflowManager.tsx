@@ -8,11 +8,12 @@ import {
   useJoin,
   usePublish,
   LocalVideoTrack,
+  useTrackEvent,
 } from "agora-rtc-react";
 import AgoraRTC, {
   DeviceInfo,
+  IAgoraRTCError,
   ICameraVideoTrack,
-  ILocalVideoTrack,
   IMicrophoneAudioTrack,
 } from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
@@ -73,7 +74,7 @@ const CallQualityFeaturesComponent: React.FC = () => {
       {connectionState === "CONNECTED" && (
         <button onClick={() => { setScreenSharing(previous => !previous) }}>{isSharingEnabled ? "Stop Sharing" : "Start Sharing"}</button>
       )}
-      {isSharingEnabled && (<ScreenShare></ScreenShare>)}
+      {isSharingEnabled && (<ScreenShare setScreenSharing={setScreenSharing}></ScreenShare>)}
       <br />
       {isMuteVideo ? (
         <button type="button" onClick={toggleMuteVideo}>
@@ -96,28 +97,35 @@ const CallQualityFeaturesComponent: React.FC = () => {
   );
 };
 
-const ScreenShare = () => {
+const ScreenShare = (props: {setScreenSharing: React.Dispatch<React.SetStateAction<boolean>>}) => {
+  const {setScreenSharing} = props;
   const screenShareClient = useRef(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
-  // explore using screenshareProvider
-  // looks like function overload isn't working
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-  const { screenTrack } = useLocalScreenTrack(true, {}, "disable", screenShareClient.current);
+  const { screenTrack, isLoading, error } = useLocalScreenTrack(true, {}, "disable", screenShareClient.current);
 
-  useJoin(
-    {
-      appid: config.appId,
-      channel: config.channelName,
-      token: null,
-      uid: 0,
-    },
-    true,
-    screenShareClient.current
-  );
-  usePublish([screenTrack as ILocalVideoTrack], screenTrack !== null, screenShareClient.current);
+  useJoin({
+    appid: config.appId,
+    channel: config.channelName,
+    token: null,
+    uid: 0,
+  }, true, screenShareClient.current);
+  usePublish([screenTrack], screenTrack !== null, screenShareClient.current);
+  // handle "stop sharing" button click
+  useTrackEvent(screenTrack, "track-ended", () => {
+    setScreenSharing(false);
+  });
+  // handle screensharing pop up close 
+  useEffect(()=>{
+    if(error) setScreenSharing(false);
+  }, [error, setScreenSharing])
+
+  if (isLoading) {
+    return <p>Loading Screenshare...</p>
+  }
+
   return (
     <>
       <p>Screen sharing enabled</p>
-      {screenTrack && <LocalVideoTrack track={screenTrack as ILocalVideoTrack} play={true} style={{ width: 600, height: 300 }} />}
+      {screenTrack && <LocalVideoTrack track={screenTrack} play={true} style={{ width: 600, height: 300 }} />}
     </>
   );
 };
