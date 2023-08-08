@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   agora-rtc-react:
-    specifier: 2.0.0-alpha.1
-    version: 2.0.0-alpha.1(agora-rtc-sdk-ng@4.18.2)(react@18.2.0)
+    specifier: 2.0.0-beta.0
+    version: 2.0.0-beta.0(agora-rtc-sdk-ng@4.18.2)(react@18.2.0)
   agora-rtc-sdk-ng:
     specifier: ^4.18.2
     version: 4.18.2
@@ -636,8 +636,8 @@ packages:
     hasBin: true
     dev: true
 
-  /agora-rtc-react@2.0.0-alpha.1(agora-rtc-sdk-ng@4.18.2)(react@18.2.0):
-    resolution: {integrity: sha512-tZJf09t9sXBO8I8mbbo88ji2KplMPtTD7l7SBb4U4gSykUZ3ChR2CfPS3ZpByDDZaHyxaGnQyt94PaHXHnygEQ==}
+  /agora-rtc-react@2.0.0-beta.0(agora-rtc-sdk-ng@4.18.2)(react@18.2.0):
+    resolution: {integrity: sha512-oyNjEy/H3C7n7ZO3HaLd3av5UMGP9oqmJ0EceOYB0JLx5bJYmAplMyx05ku+eW+GBzH+bm1UexJgo/Wzl9DQDQ==}
     engines: {node: '>=10'}
     peerDependencies:
       agora-rtc-sdk-ng: '>=4.18.2'
