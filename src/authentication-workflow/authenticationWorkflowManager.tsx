@@ -70,6 +70,7 @@ function AuthenticationWorkflowManager(props:{children?: React.ReactNode}) {
         onChange={(e) => setChannelName(e.target.value)}
         placeholder="Channel name"/>
         <button onClick={() => setJoined(true)}>Join</button>
+        {props.children}
         </>
       ) : (
         <>

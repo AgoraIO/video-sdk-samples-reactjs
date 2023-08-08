@@ -80,7 +80,7 @@ const CustomVideoAndAudioComponent: React.FC = () => {
       {customMediaState ? (
         <button onClick={() => enableCustomMedia(!customMediaState)}>Disable Media Customization</button>
       ) : (
-        <button onClick={() => enableCustomMedia(!customMediaState)}>Enable Media Customization</button>
+        <button onClick={() => enableCustomMedia(!customMediaState)} disabled = {connectionState !== "CONNECTED"}>Enable Media Customization</button>
       )}
       {customMediaState && (
         <div>
