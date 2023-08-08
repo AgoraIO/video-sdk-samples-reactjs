@@ -75,8 +75,9 @@ function AuthenticationWorkflowManager(props:{children?: React.ReactNode}) {
       ) : (
         <>
         <button onClick={() => setJoined(false)}>Leave</button>
+        <AgoraManager config={config}>
         {props.children}
-        <AgoraManager config={config} />
+        </AgoraManager>
         </>
       )}
     </div>
