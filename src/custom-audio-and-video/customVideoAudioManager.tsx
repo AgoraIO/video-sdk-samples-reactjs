@@ -27,7 +27,7 @@ const CustomVideoAndAudioComponent: React.FC = () => {
       .then((stream) => {
         const audioMediaStreamTracks = stream.getAudioTracks();
         const videoMediaStreamTracks = stream.getVideoTracks();
-        // For demonstration purposes, we used the default audio/video devices. In a real-time scenario, you can use the dropdown to select the audio/video device of your choice.        setCustomAudioTrack(AgoraRTC.createCustomAudioTrack({ mediaStreamTrack: audioMediaStreamTracks[0] }));
+        // For demonstration purposes, we used the default audio/video devices. In a real-time scenario, you can use the dropdown to select the audio/video device of your choice.
         setCustomAudioTrack(AgoraRTC.createCustomAudioTrack({ mediaStreamTrack: audioMediaStreamTracks[0] }));
         setCustomVideoTrack(AgoraRTC.createCustomVideoTrack({ mediaStreamTrack: videoMediaStreamTracks[0] }));
       }).catch((error) => console.error(error));
