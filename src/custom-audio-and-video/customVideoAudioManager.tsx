@@ -14,6 +14,46 @@ function CustomVideoAndAudioManager(): JSX.Element {
     </div>
   );
 }
+const CustomVideoAndAudioComponent: React.FC = () => {
+  const [customAudioTrack, setCustomAudioTrack] = useState<ILocalAudioTrack | null>(null);
+  const [customVideoTrack, setCustomVideoTrack] = useState<ILocalVideoTrack | null>(null);
+  const connectionState = useConnectionState();
+  const [customMediaState, enableCustomMedia] = useState(false);
+
+  // Create custom audio and video tracks using the user's media devices
+  const createCustomAudioAndVideoTracks = () => {
+    navigator.mediaDevices
+      .getUserMedia({ audio: true, video: true })
+      .then((stream) => {
+        const audioMediaStreamTracks = stream.getAudioTracks();
+        const videoMediaStreamTracks = stream.getVideoTracks();
+        // For demonstration purposes, we used the default audio/video devices. In a real-time scenario, you can use the dropdown to select the audio/video device of your choice.        setCustomAudioTrack(AgoraRTC.createCustomAudioTrack({ mediaStreamTrack: audioMediaStreamTracks[0] }));
+        setCustomAudioTrack(AgoraRTC.createCustomAudioTrack({ mediaStreamTrack: audioMediaStreamTracks[0] }));
+        setCustomVideoTrack(AgoraRTC.createCustomVideoTrack({ mediaStreamTrack: videoMediaStreamTracks[0] }));
+      }).catch((error) => console.error(error));
+  };
+
+  useEffect(() => {
+    if (connectionState === "CONNECTED") {
+      createCustomAudioAndVideoTracks();
+    }
+  }, [connectionState]);
+
+  return (
+    <div>
+      {customMediaState ? (
+        <div>
+        <button onClick={() => enableCustomMedia(!customMediaState)}>Disable Media Customization</button>
+        <div>Customized audio/video tracks playing</div>
+        <CustomAudioTrack customAudioTrack={customAudioTrack} />
+        <CustomVideoTrack customVideoTrack={customVideoTrack} />
+        </div>
+      ) : (
+        <button onClick={() => enableCustomMedia(!customMediaState)} disabled = {connectionState !== "CONNECTED"}>Enable Media Customization</button>
+      )}
+    </div>
+  );
+};
 
 const CustomAudioTrack: React.FC<{ customAudioTrack: ILocalAudioTrack | null }> = ({ customAudioTrack }) => {
   const agoraContext = useAgoraContext();
@@ -51,46 +91,5 @@ const CustomVideoTrack: React.FC<{ customVideoTrack: ILocalVideoTrack | null }> 
   return <></>;
 };
 
-const CustomVideoAndAudioComponent: React.FC = () => {
-  const [customAudioTrack, setCustomAudioTrack] = useState<ILocalAudioTrack | null>(null);
-  const [customVideoTrack, setCustomVideoTrack] = useState<ILocalVideoTrack | null>(null);
-  const connectionState = useConnectionState();
-  const [customMediaState, enableCustomMedia] = useState(false);
-
-  // Create custom audio and video tracks using the user's media devices
-  const createCustomAudioAndVideoTracks = () => {
-    navigator.mediaDevices
-      .getUserMedia({ audio: true, video: true })
-      .then((stream) => {
-        const audioMediaStreamTracks = stream.getAudioTracks();
-        const videoMediaStreamTracks = stream.getVideoTracks();
-        setCustomAudioTrack(AgoraRTC.createCustomAudioTrack({ mediaStreamTrack: audioMediaStreamTracks[0] }));
-        setCustomVideoTrack(AgoraRTC.createCustomVideoTrack({ mediaStreamTrack: videoMediaStreamTracks[0] }));
-      }).catch((error) => console.error(error));
-  };
-
-  useEffect(() => {
-    if (connectionState === "CONNECTED") {
-      createCustomAudioAndVideoTracks();
-    }
-  }, [connectionState]);
-
-  return (
-    <div>
-      {customMediaState ? (
-        <button onClick={() => enableCustomMedia(!customMediaState)}>Disable Media Customization</button>
-      ) : (
-        <button onClick={() => enableCustomMedia(!customMediaState)} disabled = {connectionState !== "CONNECTED"}>Enable Media Customization</button>
-      )}
-      {customMediaState && (
-        <div>
-          <div>Customized audio/video tracks playing</div>
-          <CustomAudioTrack customAudioTrack={customAudioTrack} />
-          <CustomVideoTrack customVideoTrack={customVideoTrack} />
-        </div>
-      )}
-    </div>
-  );
-};
 
 export default CustomVideoAndAudioManager;
