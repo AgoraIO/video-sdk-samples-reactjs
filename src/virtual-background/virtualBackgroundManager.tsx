@@ -3,9 +3,11 @@ import AgoraRTC from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
 import VirtualBackgroundExtension, { IVirtualBackgroundProcessor } from "agora-extension-virtual-background";
 import { useConnectionState } from 'agora-rtc-react';
-import wasm from "agora-extension-virtual-background/wasms/agora-wasm.wasm?url";
 import { useAgoraContext } from "../agora-manager/agoraManager";
+import wasm from "agora-extension-virtual-background/wasms/agora-wasm.wasm?url";
+import demoImage from '../assets/image.webp';
 import "../App.css";
+
 function VirtualBackgroundManager(): JSX.Element {
   return (
     <div>
@@ -19,9 +21,6 @@ function VirtualBackgroundManager(): JSX.Element {
 function VirtualBackgroundComponent() {
   const [isVirtualBackground, setVirtualBackground] = useState(false);
   const connectionState = useConnectionState();
-  const enableVirtualBackground = () => {
-    setVirtualBackground(true);
-  };
 
   return (
     <div>
@@ -31,7 +30,7 @@ function VirtualBackgroundComponent() {
           <AgoraExtensionComponent />
         </div>
       ) : (
-        <button onClick={enableVirtualBackground} disabled ={connectionState !== "CONNECTED"}>Enable virtual background</button>
+        <button onClick={() => setVirtualBackground(true)} disabled={connectionState !== "CONNECTED"}>Enable virtual background</button>
       )}
     </div>
   );
@@ -45,7 +44,6 @@ function AgoraExtensionComponent() {
   const [selectedOption, setSelectedOption] = useState(""); // Track selected dropdown option
 
   useEffect(() => {
-    
     const initializeVirtualBackgroundProcessor = async () => {
       AgoraRTC.registerExtensions([extension.current]);
 
@@ -58,72 +56,58 @@ function AgoraExtensionComponent() {
         console.log("Initializing virtual background processor...");
         try {
           processor.current = extension.current.createProcessor();
-          console.log("processor.current", processor.current);
-          console.log("wasm", wasm);
           await processor.current.init(wasm);
           agoraContext.localCameraTrack.pipe(processor.current).pipe(agoraContext.localCameraTrack.processorDestination);
-          processor.current.setOptions({
-            type: "color",
-            color: "#00ff00",
-          });
+          processor.current.setOptions({ type: "color", color: "#00ff00" });
           await processor.current.enable();
-          console.log("Virtual background enabled.");
+          setSelectedOption('color');
         } catch (error) {
           console.error("Error initializing virtual background:", error);
         }
       }
     };
 
-    initializeVirtualBackgroundProcessor();
+    void initializeVirtualBackgroundProcessor();
 
-    return async () => {
-      if (processor) {
+    return () => {
+      const disableVirtualBackground = async () => {
+        processor.current?.unpipe();
+        agoraContext.localCameraTrack.unpipe();
         await processor.current?.disable();
-      }
+      };
+      void disableVirtualBackground();
     };
   }, [agoraContext.localCameraTrack]);
 
-  
-  const changeBackground = (selectedOption: string) =>
-   { 
+
+  const changeBackground = (selectedOption: string) => {
     if (!processor.current) {
+      console.error("Virtual background processor not initialized");
       return;
     }
-    console.log("changing virtual background option to:", selectedOption);
+
+    const image = new Image();
     // Apply selected option settings here
-    if (selectedOption === "color") 
-    {
-      processor.current.setOptions({
-        type: "color",
-        color: "#00ff00",
-      });
-    } 
-    else if (selectedOption === "blur") 
-    {
-      processor.current.setOptions({type: "blur", blurDegree: 2});
-    }
-    else if (selectedOption === "image") 
-    {
-      const image = new Image();
-      image.src = "/path/to/your/image"; // Replace with the actual image path
-      image.alt = "sourceImage";
-      if(image.src === "/path/to/your/image")
-      {
-        console.log("Please specify an image path");
-        return;
-      }
-      processor.current.setOptions({type: "image", source: image})
+    switch (selectedOption) {
+      case "color":
+        processor.current.setOptions({ type: "color", color: "#00ff00" });
+        setSelectedOption(selectedOption);
+        break;
+      case "blur":
+        processor.current.setOptions({ type: "blur", blurDegree: 2 });
+        setSelectedOption(selectedOption);
+        break;
+      case "image":
+        image.onload = () => { processor.current?.setOptions({ type: "img", source: image }) }
+        image.src = demoImage;
+        setSelectedOption(selectedOption);
+        break;
     }
   }
 
   return (
     <div>
-      <select
-        value={selectedOption}
-        onChange={(event) => {changeBackground(event.target.value)}}
-        disabled={connectionState === "DISCONNECTED"}
-      >
-        <option value="">Select</option>
+      <select value={selectedOption} onChange={(event) => { changeBackground(event.target.value) }} disabled={connectionState === "DISCONNECTED"}>
         <option value="color">Color</option>
         <option value="blur">Blur</option>
         <option value="image">Image</option>
