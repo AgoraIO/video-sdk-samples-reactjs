@@ -2,7 +2,7 @@ import {
   AgoraRTCProvider,
   useRTCClient,
 } from "agora-rtc-react";
-import AgoraRTC, { IAgoraRTCClient } from "agora-rtc-sdk-ng";
+import AgoraRTC from "agora-rtc-sdk-ng";
 import ProductWorkflowManager from "./productWorkflowManager";
 
 export function ProductWorkflow() {
@@ -10,7 +10,7 @@ export function ProductWorkflow() {
 
   return (
     <div>
-      <h1>Call Quality Best Practice</h1>
+      <h1>Screen share, volume control and mute</h1>
       <AgoraRTCProvider client={agoraEngine}>
         <ProductWorkflowManager />
       </AgoraRTCProvider>

@@ -1,23 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
   useRemoteUsers,
-  useLocalMicrophoneTrack,
-  useLocalCameraTrack,
-  useLocalScreenTrack,
   useConnectionState,
   useJoin,
   usePublish,
-  LocalVideoTrack,
+  useLocalScreenTrack,
   useTrackEvent,
 } from "agora-rtc-react";
 import AgoraRTC, {
   DeviceInfo,
-  IAgoraRTCError,
-  ICameraVideoTrack,
-  IMicrophoneAudioTrack,
 } from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
-import config from "../config";
+import config from "../agora-manager/config";
+import { useAgoraContext } from "../agora-manager/agoraManager";
 
 function ProductWorkflowManager(): JSX.Element {
   return (
@@ -30,22 +25,37 @@ function ProductWorkflowManager(): JSX.Element {
 }
 
 const CallQualityFeaturesComponent: React.FC = () => {
-  const { localCameraTrack } = useLocalCameraTrack();
-  const { localMicrophoneTrack } = useLocalMicrophoneTrack();
+  const [isSharingEnabled, setScreenSharing] = useState(false);
+  const connectionState = useConnectionState();
+  return (
+    <div>
+      {connectionState === "CONNECTED" && (
+        <button onClick={() => { setScreenSharing(previous => !previous) }}>{isSharingEnabled ? "Stop Sharing" : "Start Sharing"}</button>
+      )}
+      {isSharingEnabled && (<ScreenShare setScreenSharing={setScreenSharing}></ScreenShare>)}
+      {connectionState === "CONNECTED" && (
+      <>
+      <MuteVideoComponent/> 
+      <RemoteAndLocalVolumeComponent/>
+      {OnCameraChangedHook}
+      {OnMicrophoneChangedHook}
+      </>)}
+      
+    </div>
+  );
+};
+
+const RemoteAndLocalVolumeComponent = () => {
+  const agoraContext = useAgoraContext();
+  const connectionState = useConnectionState();
   const remoteUsers = useRemoteUsers();
   const numberOfRemoteUsers = remoteUsers.length;
   const remoteUser = remoteUsers[numberOfRemoteUsers - 1];
-  const [isSharingEnabled, setScreenSharing] = useState(false);
-  const [isMuteVideo, setMuteVideo] = useState(false);
-  const connectionState = useConnectionState();
-
-  useOnCameraChanged(localCameraTrack);
-  useOnMicrophoneChanged(localMicrophoneTrack);
 
   const handleLocalAudioVolumeChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseInt(evt.target.value);
     console.log("Volume of local audio:", volume);
-    localMicrophoneTrack?.setVolume(volume);
+    agoraContext.localMicrophoneTrack?.setVolume(volume);
   };
 
   const handleRemoteAudioVolumeChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,42 +68,48 @@ const CallQualityFeaturesComponent: React.FC = () => {
     }
   };
 
+
+  return (
+    <div>
+      {connectionState === "CONNECTED" && (
+        <>
+          <label> Local Audio Level :</label>
+          <input type="range" min="0" max="100" step="1" onChange={handleLocalAudioVolumeChange} />
+        </>
+      )}
+      <div>
+        {connectionState === "CONNECTED" && (
+          <>
+            <label> Remote Audio Level :</label>
+            <input type="range" min="0" max="100" step="1" onChange={handleRemoteAudioVolumeChange} />
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
+const MuteVideoComponent = () => {
+  const agoraContext = useAgoraContext();
+  const connectionState = useConnectionState();
+  const [isMuteVideo, setMuteVideo] = useState(false);
+  
   const toggleMuteVideo = () => {
     if (connectionState === "DISCONNECTED") {
       console.log("Join a channel to mute/unmute the local video");
       return;
     }
-    localCameraTrack
-      ?.setEnabled(!isSharingEnabled)
-      .then(() => setMuteVideo((prev) => !prev))
+    agoraContext.localCameraTrack
+      ?.setEnabled(!isMuteVideo)
+      .then(() => setMuteVideo(prev => !prev))
       .catch((error) => console.error(error));
   };
 
   return (
-    <div>
-      {connectionState === "CONNECTED" && (
-        <button onClick={() => { setScreenSharing(previous => !previous) }}>{isSharingEnabled ? "Stop Sharing" : "Start Sharing"}</button>
-      )}
-      {isSharingEnabled && (<ScreenShare setScreenSharing={setScreenSharing}></ScreenShare>)}
-      <br />
-      {isMuteVideo ? (
-        <button type="button" onClick={toggleMuteVideo}>
-          Unmute Video
-        </button>
-      ) : (
-        <button type="button" onClick={toggleMuteVideo}>
-          Mute Video
-        </button>
-      )}
-      <div>
-        <label> Local Audio Level :</label>
-        <input type="range" min="0" max="100" step="1" onChange={handleLocalAudioVolumeChange} />
-      </div>
-      <div>
-        <label> Remote Audio Level :</label>
-        <input type="range" min="0" max="100" step="1" onChange={handleRemoteAudioVolumeChange} />
-      </div>
-    </div>
+    <button onClick={toggleMuteVideo}>
+      {isMuteVideo ? "Unmute Video" : "Mute Video"}
+    </button>
   );
 };
 
@@ -105,7 +121,7 @@ const ScreenShare = (props: {setScreenSharing: React.Dispatch<React.SetStateActi
   useJoin({
     appid: config.appId,
     channel: config.channelName,
-    token: null,
+    token: config.rtcToken,
     uid: 0,
   }, true, screenShareClient.current);
   usePublish([screenTrack], screenTrack !== null, screenShareClient.current);
@@ -113,7 +129,7 @@ const ScreenShare = (props: {setScreenSharing: React.Dispatch<React.SetStateActi
   useTrackEvent(screenTrack, "track-ended", () => {
     setScreenSharing(false);
   });
-  // handle screensharing pop up close 
+  // handle screen sharing pop up close 
   useEffect(()=>{
     if(error) setScreenSharing(false);
   }, [error, setScreenSharing])
@@ -121,54 +137,52 @@ const ScreenShare = (props: {setScreenSharing: React.Dispatch<React.SetStateActi
   if (isLoading) {
     return <p>Loading Screenshare...</p>
   }
-
-  return (
-    <>
-      <p>Screen sharing enabled</p>
-      {screenTrack && <LocalVideoTrack track={screenTrack} play={true} style={{ width: 600, height: 300 }} />}
-    </>
-  );
 };
 
-const useOnMicrophoneChanged = (localMicrophoneTrack: IMicrophoneAudioTrack | null) => {
+
+const OnMicrophoneChangedHook = () => {
+  const agoraContext = useAgoraContext();
   useEffect(() => {
-    AgoraRTC.onMicrophoneChanged = ((changedDevice: DeviceInfo) => {
+    const onMicrophoneChanged = (changedDevice: DeviceInfo) => {
       if (changedDevice.state === "ACTIVE") {
-        localMicrophoneTrack
-          ?.setDevice(changedDevice.device.deviceId)
-          .then(() => console.log(""))
-          .catch((error) => console.error(error));
-      } else if (changedDevice.device.label === localMicrophoneTrack?.getTrackLabel()) {
+        agoraContext.localMicrophoneTrack?.setDevice(changedDevice.device.deviceId).catch((error) => console.error(error));
+      } else if (changedDevice.device.label === agoraContext.localMicrophoneTrack?.getTrackLabel()) {
         AgoraRTC.getMicrophones()
-          .then((devices) => localMicrophoneTrack?.setDevice(devices[0].deviceId))
+          .then((devices) => agoraContext.localMicrophoneTrack?.setDevice(devices[0].deviceId))
           .catch((error) => console.error(error));
       }
-    });
+    };
+
+    AgoraRTC.onMicrophoneChanged = onMicrophoneChanged;
+
     return () => {
       AgoraRTC.onMicrophoneChanged = undefined;
-    }
-  }, [localMicrophoneTrack]);
-
+    };
+  }, [agoraContext.localMicrophoneTrack]);
+  
+  return null;
 };
 
-const useOnCameraChanged = (localCameraTrack: ICameraVideoTrack | null) => {
+const OnCameraChangedHook = () => {
+  const agoraContext = useAgoraContext();
   useEffect(() => {
-    AgoraRTC.onCameraChanged = ((changedDevice: DeviceInfo) => {
+    const onCameraChanged = (changedDevice: DeviceInfo) => {
       if (changedDevice.state === "ACTIVE") {
-        localCameraTrack
-          ?.setDevice(changedDevice.device.deviceId)
-          .then(() => console.log(""))
-          .catch((error) => console.error(error));
-      } else if (changedDevice.device.label === localCameraTrack?.getTrackLabel()) {
+        agoraContext.localCameraTrack?.setDevice(changedDevice.device.deviceId).catch((error) => console.error(error));
+      } else if (changedDevice.device.label === agoraContext.localCameraTrack?.getTrackLabel()) {
         AgoraRTC.getCameras()
-          .then((devices) => localCameraTrack?.setDevice(devices[0].deviceId))
+          .then((devices) => agoraContext.localCameraTrack?.setDevice(devices[0].deviceId))
           .catch((error) => console.error(error));
       }
-    });
+    };
+
+    AgoraRTC.onCameraChanged = onCameraChanged;
+
     return () => {
       AgoraRTC.onCameraChanged = undefined;
-    }
-  }, [localCameraTrack]);
-};
+    };
+  }, [agoraContext.localCameraTrack]);
 
+  return null;
+};
 export default ProductWorkflowManager;
