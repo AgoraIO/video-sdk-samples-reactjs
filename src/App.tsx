@@ -13,6 +13,7 @@ import MediaPlaying from "./play-media/playMedia";
 import CustomVideoAndAudio from "./custom-audio-and-video/customVideoAudio";
 import { LiveStreamingMultipleChannels } from "./live-streaming-over-multiple-channels/liveStreamingMultipleChannels";
 import config from "./agora-manager/config";
+import AINoiseReduction from "./ai-noise-suppression/aiNoiseSuppression";
 type SelectedOption =
   | "getStarted"
   | "callQuality"
@@ -26,6 +27,7 @@ type SelectedOption =
   | "customMediaSources"
   | "mediaPlaying"
   | "multiChannelLiveStreaming"
+  | "aiNoiseReduction"
   | "";
 
   type SelectedProduct =
@@ -77,6 +79,8 @@ function App() {
       case "multiChannelLiveStreaming":
         if(selectedProduct !== "ILS") return null
         else return <LiveStreamingMultipleChannels/>
+      case "aiNoiseReduction":
+        return <AINoiseReduction/>
       default:
         return null;
     }
@@ -104,6 +108,7 @@ function App() {
           <option value="customMediaSources">Custom Video and Audio</option>
           <option value="mediaPlaying">Stream media to a channel</option>
           <option value="multiChannelLiveStreaming">Live steaming over multiple channel</option>
+          <option value="aiNoiseReduction">AI Noise Suppression</option>
         </select>
         {renderSelectedOption()}
     </div>
