@@ -13,7 +13,7 @@ import {
   LocalVideoTrack,
 } from "agora-rtc-react";
 import { ICameraVideoTrack, ILocalAudioTrack } from "agora-rtc-sdk-ng";
-import config from "../config";
+import config from "../agora-manager/config";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
 
 function EnsureCallQualityManager(): JSX.Element {
@@ -64,15 +64,13 @@ const CallQualityFeaturesComponent: React.FC = () => {
   };
 
   const updateNetworkStatus = () => {
-    if (networkQuality.uplink === 0) {
-      return <label>Network Quality: Unknown</label>;
-    } else if (networkQuality.uplink === 1) {
-      return <label>Network Quality: Excellent</label>;
-    } else if (networkQuality.uplink === 2) {
-      return <label>Network Quality: Good</label>;
-    } else {
-      return <label>Network Quality: Bad</label>;
+    const networkLabels = {
+      0: 'Unknown', 1: 'Excellent',
+      2: 'Good', 3: 'Poor',
+      4: 'Bad', 5: 'Very Bad',
+      6: 'No Connection'
     }
+    return <label>Network Quality: {networkLabels[networkQuality.uplink]}</label>;
   };
 
   const showStatistics = () => {
@@ -92,17 +90,13 @@ const CallQualityFeaturesComponent: React.FC = () => {
       return;
     }
 
-    if (!isHighRemoteVideoQuality) {
-      agoraEngine
-        .setRemoteVideoStreamType(remoteUser.uid, 0)
-        .then(() => setVideoQualityState(true))
-        .catch((error) => console.error(error));
-    } else {
-      agoraEngine
-        .setRemoteVideoStreamType(remoteUser.uid, 1)
-        .then(() => setVideoQualityState(false))
-        .catch((error) => console.error(error));
-    }
+    const newQualityState = !isHighRemoteVideoQuality;
+    const streamType = newQualityState ? 0 : 1;
+
+    agoraEngine
+      .setRemoteVideoStreamType(remoteUser.uid, streamType)
+      .then(() => setVideoQualityState(newQualityState))
+      .catch((error) => console.error(error));
   };
 
   const handleStartDeviceTest = () => {
