@@ -8,6 +8,7 @@ import CallQuality from "./ensure-call-quality/ensureCallQuality";
 import VirtualBackground from "./virtual-background/virtualBackground";
 import MediaPlaying from "./play-media/playMedia";
 import CustomVideoAndAudio from "./custom-audio-and-video/customVideoAudio";
+import AINoiseReduction from "./ai-noise-suppression/aiNoiseSuppression";
 type SelectedOption =
   | "getStarted"
   | "callQuality"
@@ -20,6 +21,7 @@ type SelectedOption =
   | "audioEffects"
   | "customMediaSources"
   | "mediaPlaying"
+  | "aiNoiseReduction"
   | "";
 
 function App() {
@@ -49,6 +51,8 @@ function App() {
         return <CustomVideoAndAudio/>
       case "mediaPlaying":
         return <MediaPlaying />
+      case "aiNoiseReduction":
+        return <AINoiseReduction/>
       default:
         return null;
     }
@@ -68,6 +72,7 @@ function App() {
           <option value="virtualBackground">Virtual Background</option>
           <option value="customMediaSources">Custom Video and Audio</option>
           <option value="mediaPlaying">Stream media to a channel</option>
+          <option value="aiNoiseReduction">AI Noise Suppression</option>
         </select>
         {renderSelectedOption()}
     </div>
