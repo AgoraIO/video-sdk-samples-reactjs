@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { usePublish, useConnectionState, useRTCClient } from "agora-rtc-react";
 import AgoraRTC, { IBufferSourceAudioTrack } from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
-import { useAgoraContext } from "../agora-manager/agoraManager";
 
 function AudioAndVoiceEffectsManager(): JSX.Element {
   return (
