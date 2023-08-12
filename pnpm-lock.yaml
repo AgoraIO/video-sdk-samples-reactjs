@@ -8,6 +8,9 @@ dependencies:
   agora-extension-ai-denoiser:
     specifier: ^1.1.0
     version: 1.1.0(agora-rtc-sdk-ng@4.18.2)
+  agora-extension-spatial-audio:
+    specifier: 1.0.0-beta1
+    version: 1.0.0-beta1(agora-rtc-sdk-ng@4.18.2)
   agora-extension-virtual-background:
     specifier: ^1.1.3
     version: 1.1.3(agora-rtc-sdk-ng@4.18.2)
@@ -644,6 +647,14 @@ packages:
 
   /agora-extension-ai-denoiser@1.1.0(agora-rtc-sdk-ng@4.18.2):
     resolution: {integrity: sha512-g4klzzz7IQblNt0c+gJ/DM7sa5oMZ/7GWE4c9aqs3snHRAo+CjDieT84iAc1KUhAiY84RrfhyFdtpvbbEoYBcA==}
+    peerDependencies:
+      agora-rtc-sdk-ng: '>=4.15.0'
+    dependencies:
+      agora-rtc-sdk-ng: 4.18.2
+    dev: false
+
+  /agora-extension-spatial-audio@1.0.0-beta1(agora-rtc-sdk-ng@4.18.2):
+    resolution: {integrity: sha512-fdBBY/VpmtWDmjLklSO/WQG3LVWf9ya5K/meADxEqAbHm1FyL15AUCXw8fxeEqz8L3S3AGJh2obeliIhi/+d5A==}
     peerDependencies:
       agora-rtc-sdk-ng: '>=4.15.0'
     dependencies:
