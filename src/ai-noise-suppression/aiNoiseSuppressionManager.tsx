@@ -37,7 +37,7 @@ function AINoiseSuppressionComponent() {
 function AgoraExtensionComponent() {
   const connectionState = useConnectionState();
   const agoraContext = useAgoraContext();
-  const extension = useRef(new AIDenoiserExtension({assetsPath:'./external'}));
+  const extension = useRef(new AIDenoiserExtension({assetsPath:'./node_modules/agora-extension-ai-denoiser/external'}));
   const processor = useRef<IAIDenoiserProcessor>();
 
   useEffect(() => {
@@ -50,7 +50,7 @@ function AgoraExtensionComponent() {
 
       if (agoraContext.localMicrophoneTrack) 
       {
-        console.log("Initializing virtual background processor...");
+        console.log("Initializing an ai noise processor...");
         try {
           processor.current = extension.current.createProcessor();
           agoraContext.localMicrophoneTrack.pipe(processor.current).pipe(agoraContext.localMicrophoneTrack.processorDestination);
