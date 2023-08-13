@@ -8,6 +8,7 @@ import CallQuality from "./ensure-call-quality/ensureCallQuality";
 import VirtualBackground from "./virtual-background/virtualBackground";
 import MediaPlaying from "./play-media/playMedia";
 import CustomVideoAndAudio from "./custom-audio-and-video/customVideoAudio";
+import MediaEncryption from "./media-stream-encryption/mediaStreamEncryption";
 type SelectedOption =
   | "getStarted"
   | "callQuality"
@@ -20,6 +21,7 @@ type SelectedOption =
   | "audioEffects"
   | "customMediaSources"
   | "mediaPlaying"
+  | "mediaEncryption"
   | "";
 
 function App() {
@@ -48,6 +50,8 @@ function App() {
       case "customMediaSources":
         return <CustomVideoAndAudio/>
       case "mediaPlaying":
+      case "mediaEncryption":
+        return <MediaEncryption />;
         return <MediaPlaying />
       default:
         return null;
@@ -68,6 +72,7 @@ function App() {
           <option value="virtualBackground">Virtual Background</option>
           <option value="customMediaSources">Custom Video and Audio</option>
           <option value="mediaPlaying">Stream media to a channel</option>
+          <option value="mediaEncryption">Media Stream Encryption</option>
         </select>
         {renderSelectedOption()}
     </div>
