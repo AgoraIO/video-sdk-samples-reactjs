@@ -13,6 +13,7 @@ import MediaPlaying from "./play-media/playMedia";
 import CustomVideoAndAudio from "./custom-audio-and-video/customVideoAudio";
 import { LiveStreamingMultipleChannels } from "./live-streaming-over-multiple-channels/liveStreamingMultipleChannels";
 import config from "./agora-manager/config";
+import MediaEncryption from "./media-stream-encryption/mediaStreamEncryption";
 type SelectedOption =
   | "getStarted"
   | "callQuality"
@@ -26,6 +27,7 @@ type SelectedOption =
   | "customMediaSources"
   | "mediaPlaying"
   | "multiChannelLiveStreaming"
+  | "mediaEncryption"
   | "";
 
   type SelectedProduct =
@@ -73,6 +75,8 @@ function App() {
       case "customMediaSources":
         return <CustomVideoAndAudio/>
       case "mediaPlaying":
+      case "mediaEncryption":
+        return <MediaEncryption />;
         return <MediaPlaying />
       case "multiChannelLiveStreaming":
         if(selectedProduct !== "ILS") return null
@@ -104,6 +108,7 @@ function App() {
           <option value="customMediaSources">Custom Video and Audio</option>
           <option value="mediaPlaying">Stream media to a channel</option>
           <option value="multiChannelLiveStreaming">Live steaming over multiple channel</option>
+          <option value="mediaEncryption">Media Stream Encryption</option>
         </select>
         {renderSelectedOption()}
     </div>
