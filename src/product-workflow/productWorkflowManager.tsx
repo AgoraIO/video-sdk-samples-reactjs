@@ -14,40 +14,51 @@ import AuthenticationWorkflowManager from "../authentication-workflow/authentica
 import config from "../agora-manager/config";
 import { useAgoraContext } from "../agora-manager/agoraManager";
 
-function ProductWorkflowManager(): JSX.Element {
-  return (
+function ProductWorkflowManager(): JSX.Element 
+{
+  
+    return (
     <div>
       <AuthenticationWorkflowManager>
-        <CallQualityFeaturesComponent />
+          <ProductWorkflowComponents />
       </AuthenticationWorkflowManager>
     </div>
   );
 }
 
-const CallQualityFeaturesComponent: React.FC = () => {
-  const [isSharingEnabled, setScreenSharing] = useState(false);
+
+const ProductWorkflowComponents: React.FC = () => {
   const connectionState = useConnectionState();
-  return (
-    <div>
-      {connectionState === "CONNECTED" && (
-        <button onClick={() => { setScreenSharing(previous => !previous) }}>{isSharingEnabled ? "Stop Sharing" : "Start Sharing"}</button>
-      )}
-      {isSharingEnabled && (<ScreenShare setScreenSharing={setScreenSharing}></ScreenShare>)}
-      {connectionState === "CONNECTED" && (
-      <>
-      <MuteVideoComponent/> 
-      <RemoteAndLocalVolumeComponent/>
-      {OnCameraChangedHook}
-      {OnMicrophoneChangedHook}
-      </>)}
-      
-    </div>
+  const [IsConnected, setConnected] = useState(false);
+  useEffect(() => {
+
+    if(connectionState === "CONNECTED")
+    {
+      setConnected(true);
+    }
+    else
+    {
+      setConnected(false);
+    }
+  }, [connectionState]);
+
+      return (
+        <div>
+        {IsConnected && (
+          <>
+            <ShareScreenComponent />
+            <MuteVideoComponent />
+            <RemoteAndLocalVolumeComponent />
+            <OnMicrophoneChangedHook />
+            <OnCameraChangedHook />
+          </>
+        )}
+      </div>
   );
 };
 
 const RemoteAndLocalVolumeComponent = () => {
   const agoraContext = useAgoraContext();
-  const connectionState = useConnectionState();
   const remoteUsers = useRemoteUsers();
   const numberOfRemoteUsers = remoteUsers.length;
   const remoteUser = remoteUsers[numberOfRemoteUsers - 1];
@@ -71,19 +82,15 @@ const RemoteAndLocalVolumeComponent = () => {
 
   return (
     <div>
-      {connectionState === "CONNECTED" && (
         <>
           <label> Local Audio Level :</label>
           <input type="range" min="0" max="100" step="1" onChange={handleLocalAudioVolumeChange} />
         </>
-      )}
       <div>
-        {connectionState === "CONNECTED" && (
           <>
             <label> Remote Audio Level :</label>
             <input type="range" min="0" max="100" step="1" onChange={handleRemoteAudioVolumeChange} />
           </>
-        )}
       </div>
     </div>
   );
@@ -92,20 +99,14 @@ const RemoteAndLocalVolumeComponent = () => {
 
 const MuteVideoComponent = () => {
   const agoraContext = useAgoraContext();
-  const connectionState = useConnectionState();
   const [isMuteVideo, setMuteVideo] = useState(false);
   
   const toggleMuteVideo = () => {
-    if (connectionState === "DISCONNECTED") {
-      console.log("Join a channel to mute/unmute the local video");
-      return;
-    }
     agoraContext.localCameraTrack
-      ?.setEnabled(!isMuteVideo)
+      ?.setEnabled(isMuteVideo)
       .then(() => setMuteVideo(prev => !prev))
       .catch((error) => console.error(error));
-  };
-
+  }
   return (
     <button onClick={toggleMuteVideo}>
       {isMuteVideo ? "Unmute Video" : "Mute Video"}
@@ -113,9 +114,9 @@ const MuteVideoComponent = () => {
   );
 };
 
-const ScreenShare = (props: {setScreenSharing: React.Dispatch<React.SetStateAction<boolean>>}) => {
-  const {setScreenSharing} = props;
-  const screenShareClient = useRef(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+const ShareScreenComponent = () => {
+  const [isSharingEnabled, setScreenSharing] = useState(false);
+    const screenShareClient = useRef(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
   const { screenTrack, isLoading, error } = useLocalScreenTrack(true, {}, "disable", screenShareClient.current);
 
   useJoin({
@@ -129,14 +130,24 @@ const ScreenShare = (props: {setScreenSharing: React.Dispatch<React.SetStateActi
   useTrackEvent(screenTrack, "track-ended", () => {
     setScreenSharing(false);
   });
+  const handleToggleScreenSharing = () => {
+    setScreenSharing(previous => !previous);
+  };
   // handle screen sharing pop up close 
   useEffect(()=>{
     if(error) setScreenSharing(false);
   }, [error, setScreenSharing])
 
   if (isLoading) {
-    return <p>Loading Screenshare...</p>
+    return <p>Sharing screen...</p>
   }
+  return (
+    <div>
+      <button onClick={handleToggleScreenSharing}>
+        {isSharingEnabled ? "Stop Sharing" : "Start Sharing"}
+      </button>
+    </div>
+  )
 };
 
 
