@@ -9,9 +9,8 @@ Customer satisfaction for your Video Calling integrated app depends on the quali
 - Echo
 - Multiple users in a channel
 
-This app shows you how to use Video SDK features to account for these factors and ensure optimal audio and video quality in your app.
-
-
+This sample shows you how to use Video SDK features to account for these factors and ensure optimal audio and video 
+quality in your app.
 
 ## Understand the code
 
