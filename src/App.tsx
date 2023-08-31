@@ -4,9 +4,10 @@ import AuthenticationWorkflow from "./authentication-workflow/authenticationWork
 import Geofencing from "./geofencing/geofencing";
 import CloudProxy  from "./cloud-proxy/cloudProxy";
 import  AudioAndVoiceEffects from "./audio-and-voice-effects/audioAndVoiceEffects";
-import config from "./agora-manager/config";
 import CallQuality from "./ensure-call-quality/ensureCallQuality";
+import VirtualBackground from "./virtual-background/virtualBackground";
 import MediaPlaying from "./play-media/playMedia";
+import CustomVideoAndAudio from "./custom-audio-and-video/customVideoAudio";
 type SelectedOption =
   | "getStarted"
   | "callQuality"
@@ -17,6 +18,7 @@ type SelectedOption =
   | "authenticationWorkflow"
   | "geofencing"
   | "audioEffects"
+  | "customMediaSources"
   | "mediaPlaying"
   | "";
 
@@ -30,7 +32,7 @@ function App() {
   const renderSelectedOption = () => {
     switch (selectedOption) {
       case "getStarted":
-        return <GetStarted config={config} title="Get Started with Video Calling" />; // Step 2: Pass the title prop to GetStarted
+        return <GetStarted title="Get Started with Video Calling" />; // Step 2: Pass the title prop to GetStarted
       case "authenticationWorkflow":
         return <AuthenticationWorkflow />;
       case "geofencing":
@@ -41,6 +43,10 @@ function App() {
         return <AudioAndVoiceEffects/>
       case "callQuality":
         return <CallQuality />;
+        case "virtualBackground":
+          return <VirtualBackground />
+      case "customMediaSources":
+        return <CustomVideoAndAudio/>
       case "mediaPlaying":
         return <MediaPlaying />
       default:
@@ -59,6 +65,8 @@ function App() {
           <option value="geofencing">Geofencing</option>
           <option value="audioEffects">Audio and Voice Effects</option>
           <option value="callQuality">Ensure Call Quality</option>
+          <option value="virtualBackground">Virtual Background</option>
+          <option value="customMediaSources">Custom Video and Audio</option>
           <option value="mediaPlaying">Stream media to a channel</option>
         </select>
         {renderSelectedOption()}
