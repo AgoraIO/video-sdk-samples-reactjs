@@ -2,7 +2,6 @@
 
 You use Agora Cloud Proxy to ensure reliable connectivity for your users when they connect from an environment with a restricted network.
 
-
 This app shows you how to implement these features in your channel.
 
 ## Understand the code

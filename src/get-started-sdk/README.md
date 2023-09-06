@@ -8,7 +8,6 @@ This app shows the minimum code you need to integrate high-quality, low-latency 
 using Video SDK.
 
 
-
 ## Understand the code
 
 For context on this sample, and a full explanation of the essential code snippets used in this project, read [SDK quickstart](https://docs-beta.agora.io/en/video-calling/get-started/get-started-sdk)
