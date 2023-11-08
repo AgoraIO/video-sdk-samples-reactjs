@@ -21,7 +21,7 @@ The runnable code examples are:
 - [Geofencing](./src/geofencing/README.md) - Control and customize data routing in your app by specifying the Agora SD-RTN™ 
   region users 
   connect to.
-- [Custom audio and video](./src/custom-audio-and-video/customVideoAudioManager.tsx) - Customize your audio and video sources.
+- [Custom video and audio sources](./src/custom-audio-and-video/customVideoAudioManager.tsx) - Customize your audio and video sources.
 
 - [Screen share, volume control and mute](./src/product-workflow/productWorkflowManager.tsx) -  implement a simple workflow in your app.
 
