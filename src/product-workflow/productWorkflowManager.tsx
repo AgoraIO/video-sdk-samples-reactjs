@@ -30,6 +30,8 @@ function ProductWorkflowManager(): JSX.Element
 const ProductWorkflowComponents: React.FC = () => {
   const connectionState = useConnectionState();
   const [IsConnected, setConnected] = useState(false);
+  const [isSharingEnabled, setScreenSharing] = useState(false);
+
   useEffect(() => {
 
     if(connectionState === "CONNECTED")
@@ -41,12 +43,21 @@ const ProductWorkflowComponents: React.FC = () => {
       setConnected(false);
     }
   }, [connectionState]);
+  const handleToggleScreenSharing = () => {
+    setScreenSharing(previous => !previous);
+  };
+
 
       return (
         <div>
         {IsConnected && (
           <>
-            <ShareScreenComponent />
+          <div>
+            <button onClick={handleToggleScreenSharing}>
+              {isSharingEnabled ? "Stop Sharing" : "Start Sharing"}
+              </button>
+          </div>
+            { isSharingEnabled && <ShareScreenComponent />}
             <MuteVideoComponent />
             <RemoteAndLocalVolumeComponent />
             <OnMicrophoneChangedHook />
@@ -115,8 +126,7 @@ const MuteVideoComponent = () => {
 };
 
 const ShareScreenComponent = () => {
-  const [isSharingEnabled, setScreenSharing] = useState(false);
-    const screenShareClient = useRef(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+  const screenShareClient = useRef(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
   const { screenTrack, isLoading, error } = useLocalScreenTrack(true, {}, "disable", screenShareClient.current);
 
   useJoin({
@@ -126,27 +136,11 @@ const ShareScreenComponent = () => {
     uid: 0,
   }, true, screenShareClient.current);
   usePublish([screenTrack], screenTrack !== null, screenShareClient.current);
-  // handle "stop sharing" button click
-  useTrackEvent(screenTrack, "track-ended", () => {
-    setScreenSharing(false);
-  });
-  const handleToggleScreenSharing = () => {
-    setScreenSharing(previous => !previous);
-  };
-  // handle screen sharing pop up close 
-  useEffect(()=>{
-    if(error) setScreenSharing(false);
-  }, [error, setScreenSharing])
-
   if (isLoading) {
     return <p>Sharing screen...</p>
   }
   return (
-    <div>
-      <button onClick={handleToggleScreenSharing}>
-        {isSharingEnabled ? "Stop Sharing" : "Start Sharing"}
-      </button>
-    </div>
+    <></>
   )
 };
 
