@@ -7,68 +7,55 @@ import {
   useLocalScreenTrack,
   useTrackEvent,
 } from "agora-rtc-react";
-import AgoraRTC, {
-  DeviceInfo,
-} from "agora-rtc-sdk-ng";
+import AgoraRTC, { DeviceInfo } from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
 import config from "../agora-manager/config";
 import { useAgoraContext } from "../agora-manager/agoraManager";
 
-function ProductWorkflowManager(): JSX.Element 
-{
-  
-    return (
+function ProductWorkflowManager(): JSX.Element {
+  return (
     <div>
       <AuthenticationWorkflowManager>
-          <ProductWorkflowComponents />
+        <ProductWorkflowComponents />
       </AuthenticationWorkflowManager>
     </div>
   );
 }
 
-
 const ProductWorkflowComponents: React.FC = () => {
   const connectionState = useConnectionState();
-  const [IsConnected, setConnected] = useState(false);
+  const [isConnected, setConnected] = useState(false);
   const [isSharingEnabled, setScreenSharing] = useState(false);
 
   useEffect(() => {
-
-    if(connectionState === "CONNECTED")
-    {
-      setConnected(true);
-    }
-    else
-    {
-      setConnected(false);
-    }
+    setConnected(connectionState === "CONNECTED");
   }, [connectionState]);
+
   const handleToggleScreenSharing = () => {
-    setScreenSharing(previous => !previous);
+    setScreenSharing((previous) => !previous);
   };
 
-
-      return (
-        <div>
-        {IsConnected && (
-          <>
+  return (
+    <div>
+      {isConnected && (
+        <>
           <div>
             <button onClick={handleToggleScreenSharing}>
               {isSharingEnabled ? "Stop Sharing" : "Start Sharing"}
-              </button>
+            </button>
           </div>
-            { isSharingEnabled && <ShareScreenComponent />}
-            <MuteVideoComponent />
-            <RemoteAndLocalVolumeComponent />
-            <OnMicrophoneChangedHook />
-            <OnCameraChangedHook />
-          </>
-        )}
-      </div>
+          {isSharingEnabled && <ShareScreenComponent setScreenSharing={setScreenSharing} />}
+          <MuteVideoComponent />
+          <RemoteAndLocalVolumeComponent />
+          <OnMicrophoneChangedHook />
+          <OnCameraChangedHook />
+        </>
+      )}
+    </div>
   );
 };
 
-const RemoteAndLocalVolumeComponent = () => {
+const RemoteAndLocalVolumeComponent: React.FC = () => {
   const agoraContext = useAgoraContext();
   const remoteUsers = useRemoteUsers();
   const numberOfRemoteUsers = remoteUsers.length;
@@ -90,63 +77,72 @@ const RemoteAndLocalVolumeComponent = () => {
     }
   };
 
-
   return (
     <div>
-        <>
-          <label> Local Audio Level :</label>
-          <input type="range" min="0" max="100" step="1" onChange={handleLocalAudioVolumeChange} />
-        </>
+      <>
+        <label> Local Audio Level :</label>
+        <input type="range" min="0" max="100" step="1" onChange={handleLocalAudioVolumeChange} />
+      </>
       <div>
-          <>
-            <label> Remote Audio Level :</label>
-            <input type="range" min="0" max="100" step="1" onChange={handleRemoteAudioVolumeChange} />
-          </>
+        <>
+          <label> Remote Audio Level :</label>
+          <input type="range" min="0" max="100" step="1" onChange={handleRemoteAudioVolumeChange} />
+        </>
       </div>
     </div>
   );
 };
 
-
-const MuteVideoComponent = () => {
+const MuteVideoComponent: React.FC = () => {
   const agoraContext = useAgoraContext();
   const [isMuteVideo, setMuteVideo] = useState(false);
-  
+
   const toggleMuteVideo = () => {
     agoraContext.localCameraTrack
       ?.setEnabled(isMuteVideo)
-      .then(() => setMuteVideo(prev => !prev))
+      .then(() => setMuteVideo((prev) => !prev))
       .catch((error) => console.error(error));
-  }
+  };
+
   return (
-    <button onClick={toggleMuteVideo}>
-      {isMuteVideo ? "Unmute Video" : "Mute Video"}
-    </button>
+    <button onClick={toggleMuteVideo}>{isMuteVideo ? "Unmute Video" : "Mute Video"}</button>
   );
 };
 
-const ShareScreenComponent = () => {
+const ShareScreenComponent: React.FC<{ setScreenSharing: React.Dispatch<React.SetStateAction<boolean>> }> = ({
+  setScreenSharing,
+}) => {
   const screenShareClient = useRef(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
   const { screenTrack, isLoading, error } = useLocalScreenTrack(true, {}, "disable", screenShareClient.current);
 
-  useJoin({
-    appid: config.appId,
-    channel: config.channelName,
-    token: config.rtcToken,
-    uid: 0,
-  }, true, screenShareClient.current);
+  useJoin(
+    {
+      appid: config.appId,
+      channel: config.channelName,
+      token: config.rtcToken,
+      uid: 0,
+    },
+    true,
+    screenShareClient.current
+  );
+  useTrackEvent(screenTrack, "track-ended", () => {
+    setScreenSharing(false);
+  });
+  useEffect(() => {
+    if (error) setScreenSharing(false);
+  }, [error, setScreenSharing]);
+
   usePublish([screenTrack], screenTrack !== null, screenShareClient.current);
+
   if (isLoading) {
-    return <p>Sharing screen...</p>
+    return <p>Sharing screen...</p>;
   }
-  return (
-    <></>
-  )
+  return <></>;
 };
 
-
-const OnMicrophoneChangedHook = () => {
+const OnMicrophoneChangedHook: React.FC = () => {
   const agoraContext = useAgoraContext();
+
   useEffect(() => {
     const onMicrophoneChanged = (changedDevice: DeviceInfo) => {
       if (changedDevice.state === "ACTIVE") {
@@ -164,12 +160,13 @@ const OnMicrophoneChangedHook = () => {
       AgoraRTC.onMicrophoneChanged = undefined;
     };
   }, [agoraContext.localMicrophoneTrack]);
-  
+
   return null;
 };
 
-const OnCameraChangedHook = () => {
+const OnCameraChangedHook: React.FC = () => {
   const agoraContext = useAgoraContext();
+
   useEffect(() => {
     const onCameraChanged = (changedDevice: DeviceInfo) => {
       if (changedDevice.state === "ACTIVE") {
@@ -190,4 +187,5 @@ const OnCameraChangedHook = () => {
 
   return null;
 };
+
 export default ProductWorkflowManager;
