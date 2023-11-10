@@ -6,12 +6,12 @@ import AgoraRTC from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "./authenticationWorkflowManager.tsx";
 export function AuthenticationWorkflow() 
 {
-  const client = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
 
   return (
     <div>
       <h1>Secure Communication with an Authentication Token</h1>
-      <AgoraRTCProvider client={client}>
+      <AgoraRTCProvider client={agoraEngine}>
         <AuthenticationWorkflowManager />
       </AgoraRTCProvider>
     </div>
