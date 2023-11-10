@@ -4,7 +4,7 @@ import config from "../agora-manager/config";
 import { useClientEvent, useRTCClient } from "agora-rtc-react";
 
 async function fetchRTCToken(channelName: string) {
-  if (config.serverUrl !== "") {
+  if (channelName !== "") {
     try {
       const response = await fetch(
         `${config.proxyUrl}${config.serverUrl}/rtc/${channelName}/publisher/uid/${config.uid}/?expiry=${config.tokenExpiryTime}`
@@ -17,6 +17,7 @@ async function fetchRTCToken(channelName: string) {
       throw error;
     }
   } else {
+    console.log("You did not specify a channel name in the input field");
     return config.rtcToken;
   }
 }
@@ -45,11 +46,14 @@ function AuthenticationWorkflowManager(props: { children?: React.ReactNode }) {
   useTokenWillExpire();
 
   const fetchTokenFunction = async () => {
-    if (config.serverUrl !== "" && channelName !== "") {
+    if (config.serverUrl !== "") {
       try {
         const token = await fetchRTCToken(channelName) as string;
         config.rtcToken = token;
-        config.channelName = channelName;
+        if(channelName !== "")
+        {
+          config.channelName = channelName;
+        }
         setJoined(true)
       } catch (error) {
         console.error(error);
