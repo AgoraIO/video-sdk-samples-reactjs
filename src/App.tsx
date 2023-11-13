@@ -10,6 +10,7 @@ import ProductWorkflow from "./product-workflow/productWorkflow";
 import VirtualBackground from "./virtual-background/virtualBackground";
 import MediaPlaying from "./play-media/playMedia";
 import CustomVideoAndAudio from "./custom-audio-and-video/customVideoAudio";
+import { LiveStreamingMultipleChannels } from "./live-streaming-over-multiple-channels/liveStreamingMultipleChannels";
 type SelectedOption =
   | "getStarted"
   | "callQuality"
@@ -22,6 +23,7 @@ type SelectedOption =
   | "audioEffects"
   | "customMediaSources"
   | "mediaPlaying"
+  | "multiChannelLiveStreaming"
   | "";
 
 function App() {
@@ -53,6 +55,8 @@ function App() {
         return <CustomVideoAndAudio/>
       case "mediaPlaying":
         return <MediaPlaying />
+      case "multiChannelLiveStreaming":
+        return <LiveStreamingMultipleChannels/>
       default:
         return null;
     }
@@ -73,6 +77,8 @@ function App() {
           <option value="virtualBackground">Virtual Background</option>
           <option value="customMediaSources">Custom Video and Audio</option>
           <option value="mediaPlaying">Stream media to a channel</option>
+          <option value="multiChannelLiveStreaming">Live steaming over multiple channel</option>
+
         </select>
         {renderSelectedOption()}
     </div>
