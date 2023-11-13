@@ -32,6 +32,8 @@ The runnable code examples are:
 
 - [Screen share, volume control and mute](./src/product-workflow/productWorkflowManager.tsx) -  implement a simple workflow in your app.
 
+- [Live streaming over multiple channels](./src/live-streaming-over-multiple-channels/liveStreamingMultipleChannels.tsx) -  Join multiple channels at the same time and broadcast or receive audio and video over them.
+
 ## Prerequisites
 
 Before getting started with this reference app, ensure you have the following set up:
