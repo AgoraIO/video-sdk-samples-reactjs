@@ -9,9 +9,15 @@ const config: configType = {
   proxyUrl: "http://localhost:8080/",
   tokenExpiryTime: 600,
   token: "",
-  encryptionMode: "aes-128-xts",
+  encryptionMode: "aes-128-gcm2",
   salt: "",
   cipherKey: "",
+  destChannelName: "",
+  destChannelToken: "",
+  destUID: 2,
+  secondChannel: "",
+  secondChannelToken: "",
+  secondChannelUID: 2
 };
 
 export type configType = {
@@ -26,6 +32,12 @@ export type configType = {
   encryptionMode: EncryptionMode;
   salt: string;
   cipherKey: string;
+  destUID: number;
+  destChannelName: string,
+  destChannelToken: string,
+  secondChannel: string,
+  secondChannelToken: string
+  secondChannelUID: number
 };
 
 export default config;
