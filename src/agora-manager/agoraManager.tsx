@@ -8,20 +8,18 @@ import {
   usePublish,
   useRemoteUsers,
 } from "agora-rtc-react";
-import configImport, { configType } from "./config";
-// AgoraContext.tsx
 import React, { createContext, useContext } from "react";
 import { IMicrophoneAudioTrack, ICameraVideoTrack } from "agora-rtc-sdk-ng";
-
+import { configType } from "./config";
 interface AgoraContextType {
-  localCameraTrack: ICameraVideoTrack;
-  localMicrophoneTrack: IMicrophoneAudioTrack;
+  localCameraTrack: ICameraVideoTrack | null;
+  localMicrophoneTrack: IMicrophoneAudioTrack | null;
   children: React.ReactNode;
 }
 
 const AgoraContext = createContext<AgoraContextType | null>(null);
 
-export const AgoraProvider: React.FC<AgoraContextType> = ({ children, localCameraTrack, localMicrophoneTrack }) => (
+export const AgoraProvider: React.FC<AgoraContextType> = ({ children, localCameraTrack , localMicrophoneTrack }) => (
   <AgoraContext.Provider value={{ localCameraTrack, localMicrophoneTrack, children }}>
     {children}
   </AgoraContext.Provider>
@@ -66,4 +64,4 @@ export const AgoraManager = ({ config, children }: { config: configType; childre
   );
 };
 
-export default () => <AgoraManager config={configImport}></AgoraManager>;
+export default AgoraManager;
