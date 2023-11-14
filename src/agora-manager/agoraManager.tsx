@@ -11,11 +11,11 @@ import {
 import configImport, { configType } from "./config";
 // AgoraContext.tsx
 import React, { createContext, useContext } from "react";
-import { ILocalAudioTrack, ILocalVideoTrack } from "agora-rtc-sdk-ng";
+import { IMicrophoneAudioTrack, ICameraVideoTrack } from "agora-rtc-sdk-ng";
 
 interface AgoraContextType {
-  localCameraTrack: ILocalVideoTrack;
-  localMicrophoneTrack: ILocalAudioTrack;
+  localCameraTrack: ICameraVideoTrack;
+  localMicrophoneTrack: IMicrophoneAudioTrack;
   children: React.ReactNode;
 }
 

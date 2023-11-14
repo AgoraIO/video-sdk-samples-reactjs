@@ -6,6 +6,7 @@ import CloudProxy  from "./cloud-proxy/cloudProxy";
 import  AudioAndVoiceEffects from "./audio-and-voice-effects/audioAndVoiceEffects";
 import CallQuality from "./ensure-call-quality/ensureCallQuality";
 import ProductWorkflow from "./product-workflow/productWorkflow";
+import "./App.css";
 
 import VirtualBackground from "./virtual-background/virtualBackground";
 import MediaPlaying from "./play-media/playMedia";

@@ -90,7 +90,7 @@ export function LiveStreamingMultipleChannels() {
 
     channelMediaConfig.setSrcChannelInfo({
       channelName: config.channelName,
-      token: config.token,
+      token: config.rtcToken,
       uid: 0,
     });
   
