@@ -29,7 +29,9 @@ export function LiveStreamingMultipleChannels() {
                 {(config.secondChannel !== "" && config.secondChannelToken !== "") ? (
                 <JoinSecondChannel agoraEngineSubscriber={agoraEngineSubscriber} />
                 ) : (
-                <label>Please specify a name, token and uid for the second channel in the config file</label>
+                    <div>
+                        <label>Please specify a name, token and uid for the second channel in the config file</label>
+                    </div>
                 )}
             </AgoraRTCProvider>
           </AuthenticationWorkflowManager>

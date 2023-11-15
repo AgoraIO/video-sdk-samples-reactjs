@@ -6,9 +6,12 @@ import {
   useLocalCameraTrack,
   useLocalMicrophoneTrack,
   usePublish,
+  useRTCClient,
   useRemoteUsers,
+  useClientEvent,
 } from "agora-rtc-react";
-import React, { createContext, useContext } from "react";
+
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { IMicrophoneAudioTrack, ICameraVideoTrack } from "agora-rtc-sdk-ng";
 import { configType } from "./config";
 
@@ -39,9 +42,11 @@ export const useAgoraContext = () => {
 // AgoraManager component responsible for handling Agora-related logic and rendering UI
 export const AgoraManager = ({ config, children }: { config: configType; children: React.ReactNode }) => {
   // Retrieve local camera and microphone tracks and remote users
+  const agoraEngine = useRTCClient();
   const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack();
   const { isLoading: isLoadingMic, localMicrophoneTrack } = useLocalMicrophoneTrack();
   const remoteUsers = useRemoteUsers();
+  const [role, setRole] = useState("host"); // Default role is host
 
   // Publish local tracks
   usePublish([localMicrophoneTrack, localCameraTrack]);
@@ -54,6 +59,47 @@ export const AgoraManager = ({ config, children }: { config: configType; childre
     uid: config.uid,
   });
 
+  useClientEvent(agoraEngine, "user-joined", (user) => {
+    console.log("The user" , user.uid , " has joined the channel");
+  });
+
+  useClientEvent(agoraEngine, "user-left", (user) => {
+    console.log("The user" , user.uid , " has left the channel");
+  });
+
+  useClientEvent(agoraEngine, "user-published", (user, mediaType) => {
+    console.log("The user" , user.uid , " has published media in the channel");
+  });
+
+  const handleRoleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRole(event.target.value);
+    if(event.target.value === "host")
+    {
+      agoraEngine.setClientRole("host").then(() => {
+        // Your code to handle the resolution of the promise
+        console.log("Client role set to host successfully");
+      }).catch((error) => {
+        // Your code to handle any errors
+        console.error("Error setting client role:", error);
+      });    }
+    else{
+      agoraEngine.setClientRole("audience").then(() => {
+        // Your code to handle the resolution of the promise
+        console.log("Client role set to host successfully");
+      }).catch((error) => {
+        // Your code to handle any errors
+        console.error("Error setting client role:", error);
+      });
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      localCameraTrack?.close();
+      localMicrophoneTrack?.close();
+    };
+  }, []);
+  
   // Check if devices are still loading
   const deviceLoading = isLoadingMic || isLoadingCam;
   if (deviceLoading) return <div>Loading devices...</div>;
@@ -62,6 +108,29 @@ export const AgoraManager = ({ config, children }: { config: configType; childre
   return (
     <AgoraProvider localCameraTrack={localCameraTrack} localMicrophoneTrack={localMicrophoneTrack}>
       {children}
+      <>
+      {config.selectedProduct === "live" &&
+        (<div>
+          <label>
+            <input
+              type="radio"
+              value="host"
+              checked={role === "host"}
+              onChange={handleRoleChange}
+            />
+            Host
+          </label>
+          <label>
+            <input
+              type="radio"
+              value="audience"
+              checked={role === "audience"}
+              onChange={handleRoleChange}
+            />
+            Audience
+          </label>
+        </div>)}
+      </>
       <div id="videos">
         {/* Render the local video track */}
         <div className="vid" style={{ height: 300, width: 600 }}>
@@ -72,7 +141,7 @@ export const AgoraManager = ({ config, children }: { config: configType; childre
           <div className="vid" style={{ height: 300, width: 600 }} key={remoteUser.uid}>
             <RemoteUser user={remoteUser} playVideo={true} playAudio={true} />
           </div>
-        ))}
+        ))}       
       </div>
     </AgoraProvider>
   );

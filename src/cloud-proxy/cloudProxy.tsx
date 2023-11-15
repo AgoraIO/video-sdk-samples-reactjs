@@ -2,8 +2,9 @@ import AgoraRTC from "agora-rtc-sdk-ng";
 import { useRTCClient, AgoraRTCProvider, useClientEvent } from "agora-rtc-react";
 import {useEffect} from 'react';
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
+import config from "../agora-manager/config";
 export function CloudProxy() {
-  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: config.selectedProduct }));
   
   return (
     <div>

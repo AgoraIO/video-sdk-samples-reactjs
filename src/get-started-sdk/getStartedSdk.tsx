@@ -1,33 +1,36 @@
 import { useState } from "react";
-import {
-  AgoraRTCProvider,
-  useRTCClient
-} from "agora-rtc-react";
+import { AgoraRTCProvider, useRTCClient } from "agora-rtc-react";
 import AgoraRTC from "agora-rtc-sdk-ng";
-import configImport, { configType } from "../agora-manager/config"; // Assuming the config.ts file is in the same directory as App.tsx
-import {AgoraManager} from "../agora-manager/agoraManager";
+import { AgoraManager } from "../agora-manager/agoraManager";
 import config from "../agora-manager/config";
-interface GetStartedProps {
-  title: string;
-  config: configType;
-}
 
-export function GetStarted(props: GetStartedProps) 
-{
-  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+export function GetStarted() {
+  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: config.selectedProduct }));
   const [joined, setJoined] = useState(false);
 
+  const handleJoinClick = () => {
+    setJoined(true);
+  };
+
+  const handleLeaveClick = () => {
+    setJoined(false);
+  };
+
+  const renderActionButton = () => {
+    return joined ? (
+      <button onClick={handleLeaveClick}>Leave</button>
+    ) : (
+      <button onClick={handleJoinClick}>Join</button>
+    );
+  };
+  
   return (
     <div>
-      <h1>{props.title}</h1>
-      {!joined ? 
-      (
-        <button onClick={() => setJoined(true)}>Join</button>
-      ) : 
-      (
+      <h1>Get Started with Video Calling</h1>
+      {renderActionButton()}
+      {joined && (
         <AgoraRTCProvider client={agoraEngine}>
-          <button onClick={() => setJoined(false)}>Leave</button>
-          <AgoraManager config={config}>
+          <AgoraManager config={config} >
           </AgoraManager>
         </AgoraRTCProvider>
       )}
@@ -35,4 +38,4 @@ export function GetStarted(props: GetStartedProps)
   );
 }
 
-export default () => GetStarted({ config: configImport, title: "" });
+export default GetStarted;

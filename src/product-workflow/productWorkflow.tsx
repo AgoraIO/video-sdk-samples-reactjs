@@ -16,7 +16,7 @@ import { useAgoraContext } from "../agora-manager/agoraManager";
 
 
 export function ProductWorkflow() {
-  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: config.selectedProduct }));
 
   return (
     <div>

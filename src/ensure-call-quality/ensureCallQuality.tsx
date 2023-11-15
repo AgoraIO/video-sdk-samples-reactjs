@@ -18,7 +18,7 @@ import config from "../agora-manager/config";
 
 export function EnsureCallQuality() 
 {
-  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: config.selectedProduct }));
 
   return (
     <div>

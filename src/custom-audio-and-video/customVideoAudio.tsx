@@ -3,8 +3,9 @@ import { useState, useEffect } from "react";
 import AgoraRTC, {ILocalAudioTrack, ILocalVideoTrack } from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
 import { useAgoraContext } from "../agora-manager/agoraManager";
+import config from "../agora-manager/config";
 function CustomVideoAndAudio() {
-  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: config.selectedProduct }));
 
   return (
     <div>

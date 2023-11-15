@@ -2,9 +2,10 @@ import { AgoraRTCProvider, useRTCClient, usePublish, useConnectionState } from "
 import AgoraRTC, {IBufferSourceAudioTrack} from "agora-rtc-sdk-ng";
 import { useEffect, useState, useRef } from "react";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
+import config from "../agora-manager/config";
 
 function AudioAndVoiceEffects() {
-  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: config.selectedProduct }));
 
   return (
     <div>

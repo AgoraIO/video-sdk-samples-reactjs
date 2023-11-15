@@ -6,10 +6,11 @@ import { useAgoraContext } from "../agora-manager/agoraManager";
 import VirtualBackgroundExtension, { IVirtualBackgroundProcessor } from "agora-extension-virtual-background";
 import demoImage from '../assets/image.webp';
 import wasm from "agora-extension-virtual-background/wasms/agora-wasm.wasm?url";
+import config from "../agora-manager/config";
 
 
 function VirtualBackground() {
-  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+  const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: config.selectedProduct }));
 
   return (
     <div>
