@@ -2,13 +2,13 @@ import { EncryptionMode, UID, SDK_MODE } from "agora-rtc-sdk-ng";
 
 const config: configType = {
   uid: 0,
-  appId: "9d2498880e934632b38b0a68fa2f1622",
+  appId: "",
   channelName: "demo",
-  rtcToken: "007eJxSYNhT/LXYPvnjQom0qoLdb8ItFV/Nz/yyoYTl/Kqn61XCgn4pMFimGJlYWlhYGKRaGpuYGRslGVskGSSaWaQlGqUZmhkZGXeFpBqUMjBk97sxMEIhiM/CkJKam8/AAAgAAP//n6kfZg==",
-  serverUrl: "https://agora-token-service-production-b619.up.railway.app/",
+  rtcToken: "",
+  serverUrl: "",
   proxyUrl: "http://localhost:8080/",
   tokenExpiryTime: 600,
-  token: "007eJxSYNhUmaX6NkvysPbes49EjarnLTljfNxXd4NyaeP9tNzdulkKDJYpRiaWFhYWBqmWxiZmxkZJxhZJBolmFmmJRmmGZkZGcRbBqQalDAzHP7xlZWSAQBCfhSElNTefgQEQAAD//yj1HtA=",
+  token: "",
   encryptionMode: "aes-128-gcm2",
   salt: "",
   cipherKey: "",
