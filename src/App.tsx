@@ -6,11 +6,13 @@ import CloudProxy  from "./cloud-proxy/cloudProxy";
 import  AudioAndVoiceEffects from "./audio-and-voice-effects/audioAndVoiceEffects";
 import CallQuality from "./ensure-call-quality/ensureCallQuality";
 import ProductWorkflow from "./product-workflow/productWorkflow";
+import "./App.css";
 
 import VirtualBackground from "./virtual-background/virtualBackground";
 import MediaPlaying from "./play-media/playMedia";
 import CustomVideoAndAudio from "./custom-audio-and-video/customVideoAudio";
 import { LiveStreamingMultipleChannels } from "./live-streaming-over-multiple-channels/liveStreamingMultipleChannels";
+import config from "./agora-manager/config";
 type SelectedOption =
   | "getStarted"
   | "callQuality"
@@ -26,17 +28,34 @@ type SelectedOption =
   | "multiChannelLiveStreaming"
   | "";
 
+  type SelectedProduct =
+  | "videoCalling"
+  | "ILS"
+  | "";
+
 function App() {
   const [selectedOption, setSelectedOption] = useState<SelectedOption>("");
+  const [selectedProduct, setSelectedProduct] = useState<SelectedProduct>("");
 
   const handleOptionChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value as SelectedOption);
   };
 
+  const handleProductChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedProduct(event.target.value as SelectedProduct);
+    if(event.target.value === "ILS")
+    {
+      config.selectedProduct = "live"
+    }
+    else{
+      config.selectedProduct = "rtc";
+    }
+  };
+
   const renderSelectedOption = () => {
     switch (selectedOption) {
       case "getStarted":
-        return <GetStarted title="Get Started with Video Calling" />; // Step 2: Pass the title prop to GetStarted
+        return <GetStarted />; 
       case "authenticationWorkflow":
         return <AuthenticationWorkflow />;
       case "geofencing":
@@ -56,7 +75,8 @@ function App() {
       case "mediaPlaying":
         return <MediaPlaying />
       case "multiChannelLiveStreaming":
-        return <LiveStreamingMultipleChannels/>
+        if(selectedProduct !== "ILS") return null
+        else return <LiveStreamingMultipleChannels/>
       default:
         return null;
     }
@@ -64,6 +84,12 @@ function App() {
 
   return (
     <div>
+      <h3>Choose a product:</h3>
+        <select value={selectedProduct} onChange={handleProductChange}>
+          <option value="">Select</option>
+          <option value="videoCalling">Video Calling</option>
+          <option value="ILS">Interactive Live Streaming</option>
+        </select>
         <h3>Select a sample code:</h3>
         <select value={selectedOption} onChange={handleOptionChange}>
           <option value="">Select</option>
@@ -78,7 +104,6 @@ function App() {
           <option value="customMediaSources">Custom Video and Audio</option>
           <option value="mediaPlaying">Stream media to a channel</option>
           <option value="multiChannelLiveStreaming">Live steaming over multiple channel</option>
-
         </select>
         {renderSelectedOption()}
     </div>
