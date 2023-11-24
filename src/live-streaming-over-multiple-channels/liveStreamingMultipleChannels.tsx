@@ -7,10 +7,11 @@ import {
     useRemoteUsers,
     RemoteUser,
     useLocalCameraTrack,
-    useLocalMicrophoneTrack
+    useLocalMicrophoneTrack,
+    useClientEvent,
   } from "agora-rtc-react";
 
-import AgoraRTC, { IAgoraRTCClient } from "agora-rtc-sdk-ng";
+import AgoraRTC, { IAgoraRTCClient, ChannelMediaRelayState, ChannelMediaRelayError, ChannelMediaRelayEvent } from "agora-rtc-sdk-ng";
 import config from "../agora-manager/config";
 import {useState} from 'react';
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
@@ -77,19 +78,39 @@ export function LiveStreamingMultipleChannels() {
         </div>
     )
   }
+  
+  const useChannelMediaRelayState = () => {
+    const agoraEngine = useRTCClient();
+    useClientEvent(agoraEngine, "channel-media-relay-state", (state: ChannelMediaRelayState, code: ChannelMediaRelayError) => {
+      console.log("Channel media relay state changed :", state);
+      if(code)
+      {
+        console.error("Channel media relay error :", code);
+      }
+    });
+  };
 
+  const useChannelMediaRelayEvent = () => {
+    const agoraEngine = useRTCClient();
+    useClientEvent(agoraEngine, "channel-media-relay-event", (event: ChannelMediaRelayEvent) => {
+      console.log("Channel media relay event :", event);
+    })
+  };
+  
   const ChannelMediaRelay = () => {
     const agoraEngine = useRTCClient();
     const channelMediaConfig = AgoraRTC.createChannelMediaRelayConfiguration();
     const [isRelayRunning, setIsRelayRunning] = useState<boolean>(false);
     const connectionState = useConnectionState();
 
+    useChannelMediaRelayState();
+    useChannelMediaRelayEvent();
     if(config.destChannelName === "" || config.destChannelToken === "")
     {
         console.log("Please specify a valid channel name and a valid token for the destination channel in the config file");
         return;
     }
-
+    
     channelMediaConfig.setSrcChannelInfo({
       channelName: config.channelName,
       token: config.rtcToken,
@@ -101,7 +122,7 @@ export function LiveStreamingMultipleChannels() {
       token: config.destChannelToken,
       uid: config.destUID,
     });
-  
+
     const startChannelMediaRelay = () => {
       agoraEngine
         .startChannelMediaRelay(channelMediaConfig)
