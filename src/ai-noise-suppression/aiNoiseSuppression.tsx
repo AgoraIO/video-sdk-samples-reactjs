@@ -141,13 +141,13 @@ function AgoraExtensionComponent() {
 
   return (
     <div>
-      <label>Select a noise reduction mode: </label>
+      <label>Noise reduction mode: </label>
       <select onChange={(event) => { changeNoiseReductionMode(event.target.value) }} disabled={connectionState === "DISCONNECTED"}>
         <option value="STATIONARY_NS">Stationary noise reduction</option>
         <option value="NSNG">Normal noise reduction</option>
       </select>
       <br/>
-      <label>Select a noise reduction level: </label>
+      <label>Noise reduction level: </label>
       <select onChange={(event) => { changeNoiseReductionLevel(event.target.value) }} disabled={connectionState === "DISCONNECTED"}>
         <option value="aggressive">Aggressive</option>
         <option value="soft">Soft</option>
