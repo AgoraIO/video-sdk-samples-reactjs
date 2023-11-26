@@ -8,7 +8,7 @@ By default, Video SDK uses the basic audio and video modules on the device your 
 
 ## Understand the tech
 
-To set an external audio or video source, you configure the Agora Engine before joining a channel. To manage the capture and processing of audio and video frames, you use methods from outside the Video SDK that are specific to your custom source. Video SDK enables you to push processed audio and video data to the subscribers in a channel.
+For context on this sample, and a full explanation of the essential code snippets used in this project, read [Custom video and audio sources](https://docs.agora.io/en/interactive-live-streaming/develop/custom-video-and-audio?platform=react-js)
 
 ## How to run this project
 To see how to run this project, read the instructions in the main [README](../../readme.md) or [SDK quickstart](https://docs-beta.agora.io/en/video-calling/get-started/get-started-sdk).

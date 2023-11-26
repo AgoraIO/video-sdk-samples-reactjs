@@ -6,7 +6,7 @@ This app shows you how to implement these features in your channel.
 
 ## Understand the code
 
-For context on this sample, and a full explanation of the essential code snippets used in this project, read [Stream media to a channel](https://docs-beta.agora.io/en/video-calling/develop/play-media)
+For context on this sample, and a full explanation of the essential code snippets used in this project, read [Stream media to a channel](https://docs-beta.agora.io/en/video-calling/develop/play-media?platform=react-js).
 
 
 ## How to run this project

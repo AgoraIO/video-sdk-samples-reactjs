@@ -6,7 +6,7 @@ This app shows you how to implement these features in your channel.
 
 ## Understand the code
 
-For context on this sample, and a full explanation of the essential code snippets used in this project, read [Connect through restricted networks with Cloud Proxy](https://docs-beta.agora.io/en/video-calling/develop/cloud-proxy)
+For context on this sample, and a full explanation of the essential code snippets used in this project, read [Connect through restricted networks with Cloud Proxy](https://docs-beta.agora.io/en/video-calling/develop/cloud-proxy?platform=react-js)
 
 
 ## How to run this project

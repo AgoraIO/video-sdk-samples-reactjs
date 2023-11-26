@@ -14,8 +14,7 @@ quality in your app.
 
 ## Understand the code
 
-For context on this sample, and a full explanation of the essential code snippets used in this project, read [Call quality best practice](https://docs-beta.agora.io/en/video-calling/develop/ensure-channel-quality)
-
+For context on this sample, and a full explanation of the essential code snippets used in this project, read [Call quality best practice](https://docs-beta.agora.io/en/video-calling/develop/ensure-channel-quality?platform=react-js).
 
 ## How to run this project
 
