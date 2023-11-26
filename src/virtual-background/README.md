@@ -3,7 +3,7 @@ Virtual Background enables users to blur their background or replace it with a s
 
 ## Understand the tech
 
-For context on this sample, and a full explanation of the essential code snippets used in this project, read [Stream media to a channel](https://docs-beta.agora.io/en/video-calling/enable-features/virtual-background?platform=react-js).
+For context on this sample, and a full explanation of the essential code snippets used in this project, read [Virtual background](https://docs-beta.agora.io/en/video-calling/enable-features/virtual-background?platform=react-js).
 
 
 ## How to run this project
