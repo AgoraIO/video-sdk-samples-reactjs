@@ -3,7 +3,7 @@ import { EncryptionMode, UID, SDK_MODE } from "agora-rtc-sdk-ng";
 const config: configType = {
   uid: 0,
   appId: "",
-  channelName: "demo",
+  channelName: "test",
   rtcToken: "",
   serverUrl: "",
   proxyUrl: "http://localhost:8080/",
@@ -11,7 +11,7 @@ const config: configType = {
   token: "",
   encryptionMode: "aes-128-gcm2",
   salt: "",
-  cipherKey: "",
+  encryptionKey: "",
   destChannelName: "",
   destChannelToken: "",
   destUID: 2,
@@ -31,8 +31,8 @@ export type configType = {
   tokenExpiryTime: number;
   token: string;
   encryptionMode: EncryptionMode;
-  salt: string;
-  cipherKey: string;
+  salt: "";
+  encryptionKey: string;
   destUID: number;
   destChannelName: string,
   destChannelToken: string,
