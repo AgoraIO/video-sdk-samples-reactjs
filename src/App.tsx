@@ -113,7 +113,7 @@ function App() {
           <option value="mediaPlaying">Stream media to a channel</option>
           <option value="multiChannelLiveStreaming">Live steaming over multiple channel</option>
           <option value="aiNoiseReduction">AI Noise Suppression</option>
-          <option value="spatialAudio">Spatial Audio Extension</option>
+          <option value="spatialAudio">3D Spatial Audio</option>
         </select>
         {renderSelectedOption()}
     </div>
