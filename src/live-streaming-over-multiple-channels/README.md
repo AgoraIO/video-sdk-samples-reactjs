@@ -19,4 +19,4 @@ Agora Video SDK provides the following approaches to implementing multi-channel 
 
 ## How to run this project
 
-To see how to run this project, read the instructions in the main [README](../../README.md) or [SDK quickstart](https://docs-beta.agora.io/en/video-calling/get-started/get-started-sdk).
+To see how to run this project, read the instructions in the main [README](../../readme.md) or [SDK quickstart](https://docs-beta.agora.io/en/video-calling/get-started/get-started-sdk).
