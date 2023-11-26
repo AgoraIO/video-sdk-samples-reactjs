@@ -9,7 +9,7 @@ import {
   useJoin,
   LocalVideoTrack,
   useAutoPlayAudioTrack,
-  useVolumeLevel
+  useVolumeLevel,
 } from "agora-rtc-react";
 import AgoraRTC, {ILocalAudioTrack, ICameraVideoTrack} from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";

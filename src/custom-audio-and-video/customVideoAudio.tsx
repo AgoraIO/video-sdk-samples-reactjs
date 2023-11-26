@@ -1,9 +1,14 @@
-import { AgoraRTCProvider, useRTCClient, useConnectionState } from "agora-rtc-react";
-import { useState, useEffect } from "react";
-import AgoraRTC, {ILocalAudioTrack, ILocalVideoTrack } from "agora-rtc-sdk-ng";
+import React, { useState, useEffect } from "react";
+import {
+  AgoraRTCProvider,
+  useRTCClient,
+  useConnectionState,
+} from "agora-rtc-react";
+import AgoraRTC, {ILocalAudioTrack, ILocalVideoTrack} from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
 import { useAgoraContext } from "../agora-manager/agoraManager";
 import config from "../agora-manager/config";
+
 function CustomVideoAndAudio() {
   const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: config.selectedProduct }));
 
@@ -13,7 +18,7 @@ function CustomVideoAndAudio() {
       <AgoraRTCProvider client={agoraEngine}>
         <AuthenticationWorkflowManager>
           <CustomVideoAndAudioComponent />
-        </AuthenticationWorkflowManager>      
+        </AuthenticationWorkflowManager>
       </AgoraRTCProvider>
     </div>
   );
@@ -25,22 +30,34 @@ const CustomVideoAndAudioComponent: React.FC = () => {
   const connectionState = useConnectionState();
   const [customMediaState, enableCustomMedia] = useState(false);
 
-  // Create custom audio and video tracks using the user's media devices
-  const createCustomAudioAndVideoTracks = () => {
+  // Create custom audio track using the user's media devices
+  const createCustomAudioTrack = () => {
     navigator.mediaDevices
-      .getUserMedia({ audio: true, video: true })
+      .getUserMedia({ audio: true })
       .then((stream) => {
         const audioMediaStreamTracks = stream.getAudioTracks();
-        const videoMediaStreamTracks = stream.getVideoTracks();
-        // For demonstration purposes, we used the default audio/video devices. In a real-time scenario, you can use the dropdown to select the audio/video device of your choice.
+        // For demonstration purposes, we used the default audio device. In a real-time scenario, you can use the dropdown to select the audio device of your choice.
         setCustomAudioTrack(AgoraRTC.createCustomAudioTrack({ mediaStreamTrack: audioMediaStreamTracks[0] }));
+      })
+      .catch((error) => console.error(error));
+  };
+
+  // Create custom video track using the user's media devices
+  const createCustomVideoTrack = () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((stream) => {
+        const videoMediaStreamTracks = stream.getVideoTracks();
+        // For demonstration purposes, we used the default video device. In a real-time scenario, you can use the dropdown to select the video device of your choice.
         setCustomVideoTrack(AgoraRTC.createCustomVideoTrack({ mediaStreamTrack: videoMediaStreamTracks[0] }));
-      }).catch((error) => console.error(error));
+      })
+      .catch((error) => console.error(error));
   };
 
   useEffect(() => {
     if (connectionState === "CONNECTED") {
-      createCustomAudioAndVideoTracks();
+      createCustomAudioTrack();
+      createCustomVideoTrack();
     }
   }, [connectionState]);
 
@@ -48,19 +65,21 @@ const CustomVideoAndAudioComponent: React.FC = () => {
     <div>
       {customMediaState ? (
         <div>
-        <button onClick={() => enableCustomMedia(!customMediaState)}>Disable Media Customization</button>
-        <div>Customized audio/video tracks playing</div>
-        <CustomAudioTrack customAudioTrack={customAudioTrack} />
-        <CustomVideoTrack customVideoTrack={customVideoTrack} />
+          <button onClick={() => enableCustomMedia(!customMediaState)}>Disable Media Customization</button>
+          <div>Customized audio/video tracks playing</div>
+          <CustomAudioComponent customAudioTrack={customAudioTrack} />
+          <CustomVideoComponent customVideoTrack={customVideoTrack} />
         </div>
       ) : (
-        <button onClick={() => enableCustomMedia(!customMediaState)} disabled = {connectionState !== "CONNECTED"}>Enable Media Customization</button>
+        <button onClick={() => enableCustomMedia(!customMediaState)} disabled={connectionState !== "CONNECTED"}>
+          Enable Media Customization
+        </button>
       )}
     </div>
   );
 };
 
-const CustomAudioTrack: React.FC<{ customAudioTrack: ILocalAudioTrack | null }> = ({ customAudioTrack }) => {
+const CustomAudioComponent: React.FC<{ customAudioTrack: ILocalAudioTrack | null }> = ({ customAudioTrack }) => {
   const agoraContext = useAgoraContext();
 
   useEffect(() => {
@@ -77,7 +96,7 @@ const CustomAudioTrack: React.FC<{ customAudioTrack: ILocalAudioTrack | null }> 
   return <></>;
 };
 
-const CustomVideoTrack: React.FC<{ customVideoTrack: ILocalVideoTrack | null }> = ({ customVideoTrack }) => {
+const CustomVideoComponent: React.FC<{ customVideoTrack: ILocalVideoTrack | null }> = ({ customVideoTrack }) => {
   const agoraContext = useAgoraContext();
 
   useEffect(() => {

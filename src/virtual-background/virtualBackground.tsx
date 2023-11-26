@@ -1,13 +1,16 @@
-import { AgoraRTCProvider, useRTCClient, useConnectionState } from "agora-rtc-react";
+import { useState, useRef, useEffect } from "react";
+import {
+  AgoraRTCProvider,
+  useRTCClient,
+  useConnectionState
+} from "agora-rtc-react";
 import AgoraRTC from "agora-rtc-sdk-ng";
 import AuthenticationWorkflowManager from "../authentication-workflow/authenticationWorkflowManager";
-import { useState, useRef, useEffect } from "react";
 import { useAgoraContext } from "../agora-manager/agoraManager";
 import VirtualBackgroundExtension, { IVirtualBackgroundProcessor } from "agora-extension-virtual-background";
 import demoImage from '../assets/image.webp';
 import wasm from "agora-extension-virtual-background/wasms/agora-wasm.wasm?url";
 import config from "../agora-manager/config";
-
 
 function VirtualBackground() {
   const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: config.selectedProduct }));
@@ -36,7 +39,9 @@ function VirtualBackgroundComponent() {
           <AgoraExtensionComponent />
         </div>
       ) : (
-        <button onClick={() => setVirtualBackground(true)} disabled={connectionState !== "CONNECTED"}>Enable virtual background</button>
+        <button onClick={() => setVirtualBackground(true)} disabled={connectionState !== "CONNECTED"}>
+          Enable virtual background
+        </button>
       )}
     </div>
   );
@@ -47,16 +52,36 @@ function AgoraExtensionComponent() {
   const agoraContext = useAgoraContext();
   const extension = useRef(new VirtualBackgroundExtension());
   const processor = useRef<IVirtualBackgroundProcessor>();
-  const [selectedOption, setSelectedOption] = useState(""); // Track selected dropdown option
+  const [selectedOption, setSelectedOption] = useState("");
+
+  const checkCompatibility = () => {
+    if (!extension.current.checkCompatibility()) {
+      console.error("Virtual background not supported on this platform.");
+      // You might consider providing more information or guidance here.
+    }
+  };
+
+  const colorBackground = () => {
+    processor.current?.setOptions({ type: "color", color: "#00ff00" });
+  };
+
+  const imageBackground = () => {
+    const image = new Image();
+    image.onload = () => {
+      processor.current?.setOptions({ type: "img", source: image });
+    };
+    image.src = demoImage;
+  };
+
+  const blurBackground = () => {
+    processor.current?.setOptions({ type: "blur", blurDegree: 2 });
+  };
 
   useEffect(() => {
     const initializeVirtualBackgroundProcessor = async () => {
       AgoraRTC.registerExtensions([extension.current]);
 
-      if (!extension.current.checkCompatibility()) {
-        console.error("Does not support virtual background!");
-        return;
-      }
+      checkCompatibility();
 
       if (agoraContext.localCameraTrack) {
         console.log("Initializing virtual background processor...");
@@ -78,13 +103,12 @@ function AgoraExtensionComponent() {
     return () => {
       const disableVirtualBackground = async () => {
         processor.current?.unpipe();
-        agoraContext.localCameraTrack.unpipe();
+        agoraContext.localCameraTrack?.unpipe();
         await processor.current?.disable();
       };
       void disableVirtualBackground();
     };
   }, [agoraContext.localCameraTrack]);
-
 
   const changeBackground = (selectedOption: string) => {
     if (!processor.current) {
@@ -92,28 +116,28 @@ function AgoraExtensionComponent() {
       return;
     }
 
-    const image = new Image();
     // Apply selected option settings here
     switch (selectedOption) {
       case "color":
-        processor.current.setOptions({ type: "color", color: "#00ff00" });
         setSelectedOption(selectedOption);
+        colorBackground();
         break;
       case "blur":
-        processor.current.setOptions({ type: "blur", blurDegree: 2 });
         setSelectedOption(selectedOption);
+        blurBackground();
         break;
       case "image":
-        image.onload = () => { processor.current?.setOptions({ type: "img", source: image }) }
-        image.src = demoImage;
         setSelectedOption(selectedOption);
+        imageBackground();
         break;
+      default:
+        console.error("Invalid option:", selectedOption);
     }
-  }
+  };
 
   return (
     <div>
-      <select value={selectedOption} onChange={(event) => { changeBackground(event.target.value) }} disabled={connectionState === "DISCONNECTED"}>
+      <select value={selectedOption} onChange={(event) => changeBackground(event.target.value)} disabled={connectionState === "DISCONNECTED"}>
         <option value="color">Color</option>
         <option value="blur">Blur</option>
         <option value="image">Image</option>
