@@ -70,7 +70,7 @@ function AgoraExtensionComponent() {
     return () => {
       const disableAIDenoiser = async () => {
         processor.current?.unpipe();
-        agoraContext.localMicrophoneTrack.unpipe();
+        agoraContext.localMicrophoneTrack?.unpipe();
         await processor.current?.disable();
       };
       void disableAIDenoiser();
