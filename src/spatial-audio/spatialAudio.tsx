@@ -131,17 +131,19 @@ function AgoraExtensionComponent() {
   }, [remoteUser, isRegistered]);
 
   const updatePosition = () => {
-    if (isMediaPlaying === false && !remoteUser) {
+    if (!remoteUser && isMediaPlaying === false) {
       console.log("Currently, there is no remote user in the channel. To test spatial audio, please click the 'Play Audio File' button");
       return;
     }
     if (isMediaPlaying) {
+      // update the spatial position of the audio file.
       const processorRef = processors.current.get(mediaPlayerKey);
       processorRef?.updatePlayerPositionInfo({
         position: [distance, 0, 0],
         forward: [1, 0, 0],
       });
-    } else {
+    } else if (remoteUser) {
+      // Update the spatial position of the remote user.
       const processorRef = processors.current.get(remoteUser.uid);
       processorRef?.updateRemotePosition({
         position: [distance, 0, 0],
